@@ -1,12 +1,14 @@
 # TIPS Kanban
 
-Simple Trello Alternative for small teams besed on HTML `draggable` attribute
+Simple Trello alternative for small teams besed on HTML `draggable` attribute.
 
 This is a [Next.js](https://nextjs.org/) project
 
 ## Getting Started
 
+Rename `.env.sample` to `.env` and edit it.
 
+Copy `/sample/[...nextauth].ts` to `/src/pages/api/auth` (maybe `mkdir` it) and edit it. (ref: [Next Auth example](https://next-auth.js.org/getting-started/example))
 
 Run the development server:
 
