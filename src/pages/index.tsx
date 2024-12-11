@@ -36,7 +36,7 @@ export default function Home({ id }: { id: string }) {
 			headers: {
 				'Content-Type': 'application/json',
 			},
-			body: JSON.stringify({ title: newBoard, color }),
+			body: JSON.stringify({ title: newBoard, color, visibility }),
 		})
 		await res.json()
 		init()

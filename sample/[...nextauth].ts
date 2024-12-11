@@ -33,6 +33,7 @@ export const authOptions: AuthOptions = {
 			await db.collection(`${process.env.FIRESTORE_PREFIX}-user`).doc(user.id).set({
 				id: user.id,
 				name: user.name,
+				joined: []
 			})
 			return true
 		},

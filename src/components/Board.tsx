@@ -198,8 +198,8 @@ export const Board = ({ id, columns, setColumns, initOrder, color, setLatest }: 
 								</Editable>
 								{!modalLoading && (
 									<Flex mr="24px" pos="relative" >
-										<IconButton size="xs" onClick={() => editor.copyItem(editingCard.id)} icon={<CopyIcon />} aria-label="Copy this card" />
-										<IconButton size="xs" ml={1} colorScheme="red" onClick={() => editor.deleteItem(editingCard.id)} icon={<DeleteIcon />} aria-label="Delete this card" />
+										<IconButton title="複製" size="xs" onClick={() => editor.copyItem(editingCard.id)} icon={<CopyIcon />} aria-label="Copy this card" />
+										<IconButton title="削除" size="xs" ml={1} colorScheme="red" onClick={() => editor.deleteItem(editingCard.id)} icon={<DeleteIcon />} aria-label="Delete this card" />
 									</Flex>
 								)}
 							</Flex>

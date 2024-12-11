@@ -52,8 +52,8 @@ function CardItem(props: CardItemProps) {
 		>
 			<Text>{card.text}</Text>
 			{isContextMenuOpen && <Flex>
-				<IconButton aria-label="Duplicate" mr={1} icon={<CopyIcon />} size="xs" onClick={() => copyItem()} />
-				<IconButton aria-label="Delete" icon={<DeleteIcon />} size="xs" colorScheme="red" onClick={() => deleteItem()} />
+				<IconButton title="複製" aria-label="Duplicate" mr={1} icon={<CopyIcon />} size="xs" onClick={() => copyItem()} />
+				<IconButton title="削除" aria-label="Delete" icon={<DeleteIcon />} size="xs" colorScheme="red" onClick={() => deleteItem()} />
 			</Flex>}
 		</Flex>
 	)

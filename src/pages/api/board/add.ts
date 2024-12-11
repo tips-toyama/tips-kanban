@@ -1,4 +1,5 @@
 import { authOptions } from '@/pages/api/auth/[...nextauth]'
+import { userUpdate } from '@/utils/userUpdate'
 import admin from 'firebase-admin'
 import { getFirestore } from 'firebase-admin/firestore'
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
@@ -15,6 +16,7 @@ type Data = {
 type IBody = {
 	color: string
 	title: string
+	visibility: string
 }
 export default async function handler(req: NextApiRequest, res: NextApiResponse<Data>) {
 	const session = await getServerSession(req, res, authOptions)
@@ -39,9 +41,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
 		title: body.title,
 		order: [],
 		data: {},
-		visibility: 'limited',
+		visibility: body.visibility,
 		version: Math.floor(new Date().getTime() / 1000),
 	}
-	await db.collection(`${process.env.FIRESTORE_PREFIX}-board`).doc(uuid()).set(newBoard)
+	const newId = uuid()
+	await db.collection(`${process.env.FIRESTORE_PREFIX}-board`).doc(newId).set(newBoard)
+	if (body.visibility !== 'public') await userUpdate(session.user?.email || '', newId)
 	res.status(200).json({ success: true, error: false })
 }
