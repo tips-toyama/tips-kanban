@@ -2,7 +2,7 @@
 import { Board } from '@/components/Board'
 import type { IBoard, IBoardMetaState } from '@/types'
 import { updateMeta } from '@/utils/update'
-import { CheckIcon, EditIcon, SettingsIcon } from '@chakra-ui/icons'
+import { ArrowBackIcon, CheckIcon, EditIcon, SettingsIcon } from '@chakra-ui/icons'
 import { Box, Button, Flex, IconButton, Input, Popover, PopoverArrow, PopoverBody, PopoverCloseButton, PopoverContent, PopoverTrigger, Radio, RadioGroup, Spinner, Stack, Text, useToast } from '@chakra-ui/react'
 import type { GetServerSideProps } from 'next'
 import { getServerSession } from 'next-auth'
@@ -68,11 +68,12 @@ export default function Home({ id }: { id: string }) {
 			</Head>
 			<Box>
 				<Flex h="40px" backgroundColor={`${meta?.color}.500`} w="100vw" color="white" align="center" px="10px" justify="space-between">
-					<Flex>
-						<Text fontSize={22}>{meta?.title || ''}</Text>
+					<Flex align="center">
+						<IconButton icon={<ArrowBackIcon />} aria-label="go to home" ml={2} onClick={() => router.push('/')} variant="outline" size="xs" colorScheme="whiteAlpha" color="white" />
+						<Text fontSize={22} mx={3}>{meta?.title || ''}</Text>
 						<Popover onClose={() => updateMeta(id, setLatest, meta?.title || '', meta?.color || 'blue', meta?.visibility || 'private')}>
 							<PopoverTrigger>
-								<IconButton icon={<EditIcon />} aria-label="edit" ml={2} variant="outline" size="xs" colorScheme="whiteAlpha" color="white" />
+								<IconButton icon={<EditIcon />} aria-label="edit" variant="outline" size="xs" colorScheme="whiteAlpha" color="white" />
 							</PopoverTrigger>
 							<PopoverContent color="black">
 								<PopoverArrow />
