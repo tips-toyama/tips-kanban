@@ -1,0 +1,35 @@
+{
+	"name": "tips-kanban",
+	"version": "0.1.0",
+	"private": true,
+	"scripts": {
+		"dev": "next dev",
+		"build": "next build",
+		"start": "next start",
+		"lint:fix": "npx @biomejs/biome check --write ./"
+	},
+	"dependencies": {
+		"@chakra-ui/icons": "2.0.13",
+		"@chakra-ui/next-js": "^2.4.2",
+		"@chakra-ui/react": "2.4.1",
+		"@emotion/react": "^11.13.5",
+		"@emotion/styled": "^11.13.5",
+		"@mdxeditor/editor": "^3.20.0",
+		"@types/node": "22.10.1",
+		"@types/react": "19.0.1",
+		"@types/react-dom": "19.0.1",
+		"firebase-admin": "^13.0.1",
+		"framer-motion": "^11.13.1",
+		"next": "15.0.4",
+		"next-auth": "^4.24.11",
+		"react": "19.0.0",
+		"react-beautiful-dnd": "^13.1.1",
+		"react-dom": "19.0.0",
+		"typescript": "5.7.2",
+		"uuid": "^11.0.3"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^1.9.4",
+		"@types/react-beautiful-dnd": "^13.1.8"
+	}
+}
