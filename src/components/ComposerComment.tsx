@@ -22,7 +22,7 @@ export const ComposerComment = ({ id, userList, isUpdating, setIsUpdating }: IPr
 	const fetchComments = async () => {
 		const res = await fetch(`/api/comment/get?id=${id}`)
 		const data = await res.json()
-		setComments(data)
+		setComments(data.length ? data : [])
 	}
 	useEffect(() => {
 		fetchComments()

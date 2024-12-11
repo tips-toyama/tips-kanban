@@ -29,6 +29,7 @@ import type React from 'react'
 import { useEffect, useRef, useState } from 'react'
 import Column from './Column'
 import { Composer } from './Composer'
+import EditableText from './EditableText'
 
 interface IProps {
 	id: string
@@ -194,10 +195,7 @@ export const Board = ({ id, columns, setColumns, initOrder, color, setLatest }: 
 					<ModalContent>
 						<ModalHeader>
 							<Flex justify="space-between">
-								<Editable defaultValue={editingCard.text}>
-									<EditablePreview fontSize={32} />
-									<EditableInput onBlur={(e) => cardTitleUpdate(id, e.target.value, editingCard.text)} />
-								</Editable>
+								<EditableText textProps={{ fontSize: 32 }} defaultValue={editingCard.text} onBlur={(e) => cardTitleUpdate(id, e.target.value, editingCard.text)} />
 								{!modalLoading && (
 									<Flex mr="24px" pos="relative" >
 										<IconButton title="複製" size="xs" onClick={() => editor.copyItem(editingCard.id)} icon={<CopyIcon />} aria-label="Copy this card" />
