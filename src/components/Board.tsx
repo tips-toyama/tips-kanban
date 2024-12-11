@@ -162,7 +162,7 @@ export const Board = ({ id, columns, setColumns, initOrder, color, setLatest }: 
 	}
 	const cardTitleUpdate = (cardId: string, newTitle: string, oldValue: string) => {
 		if (newTitle === oldValue) return
-		setEditingCard({ id, text: newTitle, latest: editingCard?.latest || 0 })
+		setEditingCard({ id: cardId, text: newTitle, latest: editingCard?.latest || 0 })
 		const { key: targetKey, cardIndex } = findColumn(columns, cardId)
 		const newColumns = { ...columns }
 		if (!targetKey) return
@@ -195,7 +195,7 @@ export const Board = ({ id, columns, setColumns, initOrder, color, setLatest }: 
 					<ModalContent>
 						<ModalHeader>
 							<Flex justify="space-between">
-								<EditableText textProps={{ fontSize: 32 }} defaultValue={editingCard.text} onBlur={(e) => cardTitleUpdate(id, e.target.value, editingCard.text)} />
+								<EditableText textProps={{ fontSize: 32 }} defaultValue={editingCard.text} onBlur={(e) => cardTitleUpdate(editingCard.id, e.target.value, editingCard.text)} />
 								{!modalLoading && (
 									<Flex mr="24px" pos="relative" >
 										<IconButton title="複製" size="xs" onClick={() => editor.copyItem(editingCard.id)} icon={<CopyIcon />} aria-label="Copy this card" />
