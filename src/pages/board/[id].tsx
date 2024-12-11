@@ -50,6 +50,19 @@ export default function Home({ id }: { id: string }) {
 			setIsLoading(false)
 		}
 	}
+	const deleteBoard = async () => {
+		setIsLoading(true)
+		if (!confirm('本当に削除しますか？この操作は戻せません、')) return
+		const res = await fetch('/api/board/delete', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({ id }),
+		})
+		const data = await res.json()
+		router.push('/')
+	}
 	useEffect(() => {
 		init(false)
 		const timer = setInterval(() => {
@@ -79,9 +92,11 @@ export default function Home({ id }: { id: string }) {
 								<PopoverArrow />
 								<PopoverCloseButton />
 								<PopoverBody pt={8}>
-									<Box>
+									<Flex justify="space-between">
+										<Text>ボード名</Text>
+										<Button variant="link" colorScheme="red" onClick={() => deleteBoard()}>ボードの削除</Button>
+									</Flex>
 										<Input type="text" value={meta?.title} onChange={(e) => setMeta({ color: meta?.color || 'blue', title: e.target.value, visibility: meta?.visibility || 'private' })} />
-									</Box>
 									<Flex mt={3}>
 										<IconButton
 											aria-label="blue"
@@ -134,8 +149,8 @@ export default function Home({ id }: { id: string }) {
 									</Flex>
 									<RadioGroup my={2} onChange={(e: any) => setMeta({ ...(meta || { title: '', color: 'blue' }), visibility: e })} value={meta?.visibility || 'private'}>
 										<Stack direction="row">
-											<Radio value="public">公開</Radio>
-											<Radio value="limited" isDisabled={initVis === 'public'}>限定公開</Radio>
+											<Radio value="public" colorScheme={meta?.color}>公開</Radio>
+											<Radio value="limited" colorScheme={meta?.color} isDisabled={initVis === 'public'}>限定公開</Radio>
 										</Stack>
 									</RadioGroup>
 									<Text>共有リンク</Text>

@@ -117,8 +117,8 @@ export default function Home({ id }: { id: string }) {
 								</Flex>
 								<RadioGroup my={2} onChange={(e: any) => setVisibility(e)} value={visibility}>
 									<Stack direction="row">
-										<Radio value="public">公開</Radio>
-										<Radio value="limited">限定公開</Radio>
+										<Radio value="public" colorScheme={color}>公開</Radio>
+										<Radio value="limited" colorScheme={color}>限定公開</Radio>
 									</Stack>
 								</RadioGroup>
 								<Button w="100%" colorScheme={color} onClick={() => addBoard()} isLoading={isLoading}>
