@@ -43,6 +43,7 @@ export const Board = ({ id, columns, setColumns, initOrder, color, setLatest }: 
 	const [ordered, setOrdered] = useState(initOrder)
 	const [editingCard, setEditingCard] = useState<{ id: string; text: string; latest: number } | null>(null)
 	const [modalLoading, setModalLoading] = useState(false)
+	const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
 	const [cardDetails, setCardDetails] = useState<ICardDetails | null>(null)
 	const [draggingCard, setDraggingCard] = useState('')
 	const [newColumn, setNewColumn] = useState('')
@@ -181,12 +182,13 @@ export const Board = ({ id, columns, setColumns, initOrder, color, setLatest }: 
 		newColumns[newColumn] = []
 		setColumns(newColumns)
 		setOrdered([...ordered, newColumn])
+		setNewColumn('')
 		update(id, setLatest, undefined, 'addColumn', newColumns, [...ordered, newColumn])
 	}
 
 	return (
 		<>
-			<Modal isCentered={true} scrollBehavior="inside" blockScrollOnMount={false} isOpen={isOpen} onClose={onClose} size={modalLoading ? 'sm' : width < 600 ? 'full' : '3xl'}>
+			<Modal closeOnOverlayClick={!hasUnsavedChanges} isCentered={true} scrollBehavior="inside" blockScrollOnMount={false} isOpen={isOpen} onClose={onClose} size={modalLoading ? 'sm' : width < 600 ? 'full' : '3xl'}>
 				<ModalOverlay />
 				{editingCard ? (
 					<ModalContent>
@@ -203,11 +205,11 @@ export const Board = ({ id, columns, setColumns, initOrder, color, setLatest }: 
 									</Flex>
 								)}
 							</Flex>
-							<ModalCloseButton mb={2} />
+							<ModalCloseButton isDisabled={hasUnsavedChanges} mb={2} />
 						</ModalHeader>
 						<ModalBody>
 							{!modalLoading && cardDetails ? (
-								<Composer id={editingCard.id} data={cardDetails} cardProgressUpdate={cardProgressUpdate} color={color} latest={editingCard.latest} />
+								<Composer setHasUnsavedChanges={setHasUnsavedChanges} id={editingCard.id} data={cardDetails} cardProgressUpdate={cardProgressUpdate} color={color} latest={editingCard.latest} />
 							) : (
 								<Flex mb={10} justify="center" align="center">
 									<Spinner />

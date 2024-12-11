@@ -17,7 +17,7 @@ export const userUpdate = async (userId: string, boardId: string) => {
 	await db
 		.collection(`${process.env.FIRESTORE_PREFIX}-user`)
 		.doc(userId)
-		.set({
+		.update({
 			joined: [
 				...json.joined,
 				boardId,

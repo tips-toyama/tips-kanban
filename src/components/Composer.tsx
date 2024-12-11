@@ -1,6 +1,6 @@
 'use client'
 
-import type { ICardDetails, IUser } from '@/types'
+import type { ICardDetails, IState, IUser } from '@/types'
 import { Box, Button, Flex, Input, Skeleton, Text } from '@chakra-ui/react'
 import Image from 'next/image'
 import React, { useEffect, useState } from 'react'
@@ -29,6 +29,7 @@ import { ComposerComment } from './ComposerComment'
 interface IProps {
 	data: ICardDetails
 	id: string
+	setHasUnsavedChanges: IState<boolean>
 	cardProgressUpdate: (id: string, checkList: number, checkListDone: number) => void
 	color: string
 	latest: number
@@ -39,7 +40,7 @@ const usersMock: IUser[] = [
 ]
 const interval = 60000
 //const interval = 3000
-export const Composer = ({ data: initData, id, cardProgressUpdate, color, latest: initLatest }: IProps) => {
+export const Composer = ({ data: initData, id, cardProgressUpdate, color, latest: initLatest, setHasUnsavedChanges }: IProps) => {
 	const [latest, setLatest] = useState(initLatest)
 	const ref = React.useRef<MDXEditorMethods>(null)
 	const [data, setData] = useState<ICardDetails>(initData)
@@ -127,8 +128,14 @@ export const Composer = ({ data: initData, id, cardProgressUpdate, color, latest
 							),
 						}),
 					]}
-					onChange={setContent}
-					onBlur={(e) => updateCard(id, latest, setLatest, 'content', { ...data, content }, setIsUpdating, false)}
+					onChange={(e) => {
+						setContent(e)
+						setHasUnsavedChanges(true)
+					}}
+					onBlur={async (e) => {
+						await updateCard(id, latest, setLatest, 'content', { ...data, content }, setIsUpdating, false)
+						setHasUnsavedChanges(false)
+					}}
 				/>
 			</Box>
 			<ComposerCheckList
@@ -145,7 +152,7 @@ export const Composer = ({ data: initData, id, cardProgressUpdate, color, latest
 			<Text fontWeight="bold" fontSize={22} mb={2}>
 				添付ファイル
 			</Text>
-			{isUpdating ? <Skeleton h="40px" /> : <Input type="file" isDisabled={isUpdating} pt={1} m={0} h="40px" onChange={(e) => uplaodFn(e)} />}
+			{isUploading ? <Skeleton h="40px" /> : <Input type="file" isDisabled={isUpdating} pt={1} m={0} h="40px" onChange={(e) => uplaodFn(e)} />}
 			{data.attachments.map((a) => (
 				<Box key={a.url} my={5}>
 					{a.mime.match(/^image\//) ? (
@@ -177,6 +184,7 @@ export const Composer = ({ data: initData, id, cardProgressUpdate, color, latest
             .markdownEditor h5 { font-weight: bold; font-size: 1.2rem;}
             .markdownEditor h6 { font-weight: bold; font-size: 1rem;}
             .markdownEditor ul, .markdownEditor ol { margin-left: 1rem; }
+            .markdownEditor a { color: #4063cf; cursor: pointer; }
             `}</style>
 		</Box>
 	)
