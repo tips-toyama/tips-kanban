@@ -30,6 +30,8 @@ export const authOptions: AuthOptions = {
 				})
 			}
 			const db = getFirestore()
+			const isUser = await db.collection(`${process.env.FIRESTORE_PREFIX}-user`).doc(user.id).get()
+			if (isUser.exists) return true
 			await db.collection(`${process.env.FIRESTORE_PREFIX}-user`).doc(user.id).set({
 				id: user.id,
 				name: user.name,
