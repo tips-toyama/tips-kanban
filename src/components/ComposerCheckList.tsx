@@ -6,6 +6,7 @@ import React, { useState } from 'react'
 import '@mdxeditor/editor/style.css'
 import { updateCard } from '@/utils/update'
 import { ChevronDownIcon, ChevronUpIcon, DeleteIcon } from '@chakra-ui/icons'
+import { useTranslation } from 'next-i18next'
 
 interface IProps {
 	id: string
@@ -20,6 +21,7 @@ interface IProps {
 }
 export const ComposerCheckList = ({ id: cardId, data, setData, color, cardProgressUpdate, isUpdating, setIsUpdating, latest, setLatest }: IProps) => {
 	const [newCheckList, setNewCheckList] = useState('')
+	const { t } = useTranslation('common')
 	const checkListDoneUpdate = (id: string, done: boolean) => {
 		const newCL: ICheckList[] = data.checkList.map((c) => (c.id === id ? { ...c, isDone: done } : c))
 		const newData = { ...data }
@@ -44,7 +46,7 @@ export const ComposerCheckList = ({ id: cardId, data, setData, color, cardProgre
 		updateCard(cardId, latest, setLatest, 'changeCheckList', newData, setIsUpdating, false)
 	}
 	const checkListRemove = (id: string) => {
-		if (!confirm('削除しますか？')) return
+		if (!confirm(t('confirmDelete'))) return
 		const newCL: ICheckList[] = data.checkList.filter((c) => c.id !== id)
 		const newData = { ...data }
 		newData.checkList = newCL
@@ -75,7 +77,7 @@ export const ComposerCheckList = ({ id: cardId, data, setData, color, cardProgre
 	return (
 		<Box>
 			<Text fontWeight="bold" fontSize={22} my={2}>
-				チェックボックス
+				{t('checkList')}
 			</Text>
 			<Flex flexDir="column">
 				{data.checkList.map((c, i) => (
@@ -103,9 +105,9 @@ export const ComposerCheckList = ({ id: cardId, data, setData, color, cardProgre
 				))}
 				<form onSubmit={(e) => e.preventDefault()}>
 					<Flex mt={3}>
-						<Input value={newCheckList} readOnly={isUpdating} onChange={(e) => setNewCheckList(e.target.value)} placeholder="新しいチェックリスト" />
+						<Input value={newCheckList} readOnly={isUpdating} onChange={(e) => setNewCheckList(e.target.value)} placeholder={t('addCheckList')} />
 						<Button ml={2} type="submit" isDisabled={isUpdating} onClick={() => checkListAdd(newCheckList)}>
-							追加
+							{t('add')}
 						</Button>
 					</Flex>
 				</form>

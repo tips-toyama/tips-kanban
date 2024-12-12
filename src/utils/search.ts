@@ -9,6 +9,5 @@ export const findColumn = (board: IBoard, cardId: string) => {
 	return { key: null, cardIndex: -1 }
 }
 export const findUser = (users: IUser[], userId: string) => {
-	console.log(users, userId)
 	return users.find((user) => user.id === userId)
 }

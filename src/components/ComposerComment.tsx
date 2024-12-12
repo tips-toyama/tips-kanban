@@ -5,6 +5,8 @@ import { Box, Button, Flex, Input, Text } from '@chakra-ui/react'
 import React, { useEffect, useState } from 'react'
 import '@mdxeditor/editor/style.css'
 import { findUser } from '@/utils/search'
+import { useRouter } from 'next/router'
+import { useTranslation } from 'next-i18next'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import 'dayjs/locale/ja'
@@ -21,6 +23,8 @@ interface IProps {
 //const interval = 3000000
 const interval = 60000
 export const ComposerComment = ({ id, userList, isUpdating, setIsUpdating }: IProps) => {
+	const { t } = useTranslation('common')
+	const { locale } = useRouter()
 	const [comments, setComments] = useState<IComment[]>([])
 	const [comment, setComment] = useState('')
 	const fetchComments = async () => {
@@ -54,13 +58,13 @@ export const ComposerComment = ({ id, userList, isUpdating, setIsUpdating }: IPr
 	return (
 		<Box>
 			<Text fontWeight="bold" fontSize={22} my={2}>
-				コメント
+				{t('comment')}
 			</Text>
 			{comments.map((c) => (
 				<Flex key={c.id}>
 					<Box w="100%">
 						<Text fontSize={14} color="gray.500">
-							{findUser(userList, c.owner)?.name} {dayjs(c.createdAtUnix * 1000).locale('ja').fromNow()}
+							{findUser(userList, c.owner)?.name} {dayjs(c.createdAtUnix * 1000).locale(locale || 'en').fromNow()}
 						</Text>
 						<Box p={3} w="100%" borderRadius={10} bgColor="gray.50">
 							<Text>{c.text}</Text>
@@ -69,9 +73,9 @@ export const ComposerComment = ({ id, userList, isUpdating, setIsUpdating }: IPr
 				</Flex>
 			))}
 			<Flex mt={3}>
-				<Input value={comment} onChange={(e) => setComment(e.target.value)} placeholder="コメントを入力" />
+				<Input value={comment} onChange={(e) => setComment(e.target.value)} placeholder={t('addComment')} />
 				<Button onClick={send} isDisabled={isUpdating} ml={2}>
-					送信
+					{t('send')}
 				</Button>
 			</Flex>
 		</Box>

@@ -5,15 +5,18 @@ import { updateMeta } from '@/utils/update'
 import { ArrowBackIcon, CheckIcon, EditIcon, SettingsIcon } from '@chakra-ui/icons'
 import { Box, Button, Flex, IconButton, Input, Popover, PopoverArrow, PopoverBody, PopoverCloseButton, PopoverContent, PopoverTrigger, Radio, RadioGroup, Spinner, Stack, Text, useToast } from '@chakra-ui/react'
 import type { GetServerSideProps } from 'next'
-import { getServerSession } from 'next-auth'
+import { useTranslation } from 'next-i18next'
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { signOut, useSession } from 'next-auth/react'
 import Head from 'next/head'
+import NextLink from 'next/link'
 import { useRouter } from 'next/router'
 
 import { useEffect, useState } from 'react'
 const interval = 3000000
 //const interval = 3000
 export default function Home({ id }: { id: string }) {
+	const { t } = useTranslation('common')
 	const toast = useToast()
 	const router = useRouter()
 	const { data: session, status } = useSession()
@@ -52,7 +55,7 @@ export default function Home({ id }: { id: string }) {
 	}
 	const deleteBoard = async () => {
 		setIsLoading(true)
-		if (!confirm('本当に削除しますか？この操作は戻せません、')) return
+		if (!confirm(t('confirmDelete'))) return
 		const res = await fetch('/api/board/delete', {
 			method: 'POST',
 			headers: {
@@ -93,10 +96,10 @@ export default function Home({ id }: { id: string }) {
 								<PopoverCloseButton />
 								<PopoverBody pt={8}>
 									<Flex justify="space-between">
-										<Text>ボード名</Text>
-										<Button variant="link" colorScheme="red" onClick={() => deleteBoard()}>ボードの削除</Button>
+										<Text>{t('boardName')}</Text>
+										<Button variant="link" colorScheme="red" onClick={() => deleteBoard()}>{t('boardDelete')}</Button>
 									</Flex>
-										<Input type="text" value={meta?.title} onChange={(e) => setMeta({ color: meta?.color || 'blue', title: e.target.value, visibility: meta?.visibility || 'private' })} />
+									<Input type="text" value={meta?.title} onChange={(e) => setMeta({ color: meta?.color || 'blue', title: e.target.value, visibility: meta?.visibility || 'private' })} />
 									<Flex mt={3}>
 										<IconButton
 											aria-label="blue"
@@ -149,11 +152,11 @@ export default function Home({ id }: { id: string }) {
 									</Flex>
 									<RadioGroup my={2} onChange={(e: any) => setMeta({ ...(meta || { title: '', color: 'blue' }), visibility: e })} value={meta?.visibility || 'private'}>
 										<Stack direction="row">
-											<Radio value="public" colorScheme={meta?.color}>公開</Radio>
-											<Radio value="limited" colorScheme={meta?.color} isDisabled={initVis === 'public'}>限定公開</Radio>
+											<Radio value="public" colorScheme={meta?.color}>{t('public')}</Radio>
+											<Radio value="limited" colorScheme={meta?.color} isDisabled={initVis === 'public'}>{t('limited')}</Radio>
 										</Stack>
 									</RadioGroup>
-									<Text>共有リンク</Text>
+									<Text>{t('shareLink')}</Text>
 									<Input defaultValue={`${!!window ? window.location.origin : ''}/board/${id}`} readOnly onFocus={(e) => e.target.select()} />
 								</PopoverBody>
 							</PopoverContent>
@@ -170,17 +173,25 @@ export default function Home({ id }: { id: string }) {
 							<PopoverBody pt={8}>
 								<Box>{session?.user?.name}</Box>
 								<Button w="100%" onClick={() => signOut()}>
-									ログアウト
+									{t('logout')}
 								</Button>
+								<Flex mt={2}>
+									<NextLink href={`/board/${id}`} locale="en">
+										<Button variant="link" isDisabled={router.locale === 'en'}>English</Button>
+									</NextLink>
+									<NextLink href={`/board/${id}`} locale="ja">
+										<Button ml={2} variant="link" isDisabled={router.locale === 'ja'}>日本語</Button>
+									</NextLink>
+								</Flex>
 							</PopoverBody>
 						</PopoverContent>
 					</Popover>
 				</Flex>
 				{hasLatest && (
 					<Flex position="fixed" bgColor={`${meta?.color}.400`} color="white" zIndex={3} width="100vw" px="8px" py="2px" align="center">
-						<Text>新しいデータがあります。</Text>
+						<Text>{t('hasNewData')}</Text>
 						<Button colorScheme={meta?.color} ml={2} onClick={() => init(true)}>
-							更新
+							{t('refresh')}
 						</Button>
 					</Flex>
 				)}
@@ -199,7 +210,13 @@ export default function Home({ id }: { id: string }) {
 }
 export const getServerSideProps: GetServerSideProps = async (context) => {
 	const { id } = context.query
+
 	return {
-		props: { id },
+		props: {
+			id,
+			...(await serverSideTranslations(context.locale || 'en', [
+				'common',
+			])),
+		}
 	}
 }

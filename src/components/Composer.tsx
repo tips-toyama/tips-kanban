@@ -26,6 +26,7 @@ import Link from 'next/link'
 import { ComposerCheckList } from './ComposerCheckList'
 import { ComposerComment } from './ComposerComment'
 import { ComposerHistory } from './ComposerHistory'
+import { useTranslation } from 'next-i18next'
 
 interface IProps {
 	data: ICardDetails
@@ -42,6 +43,7 @@ const usersMock: IUser[] = [
 const interval = 60000
 //const interval = 3000
 export const Composer = ({ data: initData, id, cardProgressUpdate, color, latest: initLatest, setHasUnsavedChanges }: IProps) => {
+	const { t } = useTranslation('common')
 	const [latest, setLatest] = useState(initLatest)
 	const ref = React.useRef<MDXEditorMethods>(null)
 	const [data, setData] = useState<ICardDetails>(initData)
@@ -104,9 +106,9 @@ export const Composer = ({ data: initData, id, cardProgressUpdate, color, latest
 		<Box>
 			{hasNewCardData && (
 				<Flex mb={2} bgColor={`${color}.600`} color="white" align="center" borderRadius={10} p={1} px={5}>
-					新しいデータがあります。
+					{t('hasNewData')}
 					<Button colorScheme={color} ml={2} size="sm" onClick={() => fn(false)}>
-						更新
+						{t('refresh')}
 					</Button>
 				</Flex>
 			)}
@@ -157,7 +159,7 @@ export const Composer = ({ data: initData, id, cardProgressUpdate, color, latest
 				cardProgressUpdate={cardProgressUpdate}
 			/>
 			<Text fontWeight="bold" fontSize={22} my={2}>
-				添付ファイル
+				{t('attachFile')}
 			</Text>
 			{isUploading ? <Skeleton h="40px" /> : <Input type="file" isDisabled={isUpdating} pt={1} m={0} h="40px" onChange={(e) => uplaodFn(e)} />}
 			{data.attachments.map((a) => (

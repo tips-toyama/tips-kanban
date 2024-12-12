@@ -8,9 +8,12 @@ import { signOut, useSession } from 'next-auth/react'
 import Head from 'next/head'
 import NextLink from 'next/link'
 import { useRouter } from 'next/router'
-
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'next-i18next'
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
+
 export default function Home({ id }: { id: string }) {
+	const { t } = useTranslation('common')
 	const router = useRouter()
 	const [isLoading, setIsLoading] = useState(false)
 	const [newBoard, setNewBoard] = useState('')
@@ -64,7 +67,7 @@ export default function Home({ id }: { id: string }) {
 			<Box>
 				<Flex h="40px" backgroundColor="blue.500" w="100vw" color="white" align="center" px="10px" justify="space-between">
 					<Flex>
-						<Text fontSize={22}>Kanban</Text>
+						<Text fontSize={22}>TIPS Kanban</Text>
 						{isLoading && <Spinner ml={2} size="md" />}
 					</Flex>
 					<Popover>
@@ -77,14 +80,22 @@ export default function Home({ id }: { id: string }) {
 							<PopoverBody pt={8}>
 								<Box>{session?.user?.name}</Box>
 								<Button w="100%" onClick={() => signOut()}>
-									ログアウト
+									{t('logout')}
 								</Button>
+								<Flex mt={2}>
+									<NextLink href={`/board/${id}`} locale="en">
+										<Button variant="link" isDisabled={router.locale === 'en'}>English</Button>
+									</NextLink>
+									<NextLink href={`/board/${id}`} locale="ja">
+										<Button ml={2} variant="link" isDisabled={router.locale === 'ja'}>日本語</Button>
+									</NextLink>
+								</Flex>
 							</PopoverBody>
 						</PopoverContent>
 					</Popover>
 				</Flex>
 				<Flex p={5} align="center">
-					<Text fontSize={22}>こんにちは、{session?.user?.name}さん。</Text>
+					<Text fontSize={22}>{t('greeting', { name: session?.user?.name })}</Text>
 					<IconButton icon={<RepeatIcon />} aria-label="refresh" onClick={() => init()} />
 				</Flex>
 				<Flex flexWrap="wrap" px={5}>
@@ -98,14 +109,14 @@ export default function Home({ id }: { id: string }) {
 					<Popover>
 						<PopoverTrigger>
 							<Flex m={3} cursor="pointer" p={3} bgColor="white" w={150} h={150} backgroundColor="gray.50" borderRadius={5} my={2} align="center" justify="center">
-								<Text fontWeight="bold">ボードを追加</Text>
+								<Text fontWeight="bold">{t('addBoard')}</Text>
 							</Flex>
 						</PopoverTrigger>
 						<PopoverContent color="black">
 							<PopoverArrow />
 							<PopoverCloseButton />
 							<PopoverBody pt={8}>
-								<Text>ボードを追加</Text>
+								<Text>{t('addBoard')}</Text>
 								<Input value={newBoard} onChange={(e) => setNewBoard(e.target.value)} />
 								<Flex mt={3}>
 									<IconButton aria-label="blue" onClick={() => setColor('blue')} colorScheme="blue" size="xs" mx={1} icon={color === 'blue' ? <CheckIcon /> : undefined} />
@@ -117,12 +128,12 @@ export default function Home({ id }: { id: string }) {
 								</Flex>
 								<RadioGroup my={2} onChange={(e: any) => setVisibility(e)} value={visibility}>
 									<Stack direction="row">
-										<Radio value="public" colorScheme={color}>公開</Radio>
-										<Radio value="limited" colorScheme={color}>限定公開</Radio>
+										<Radio value="public" colorScheme={color}>{t('public')}</Radio>
+										<Radio value="limited" colorScheme={color}>{t('limited')}</Radio>
 									</Stack>
 								</RadioGroup>
 								<Button w="100%" colorScheme={color} onClick={() => addBoard()} isLoading={isLoading}>
-									追加
+									{t('add')}
 								</Button>
 							</PopoverBody>
 						</PopoverContent>
@@ -135,5 +146,11 @@ export default function Home({ id }: { id: string }) {
 export const getServerSideProps: GetServerSideProps = async (context) => {
 	const session = await getServerSession(context.req, context.res, {})
 	if (!session) return { redirect: { destination: '/api/auth/signin', permanent: false } }
-	return { props: {} }
+	return {
+		props: {
+			...(await serverSideTranslations(context.locale || 'en', [
+				'common',
+			])),
+		}
+	}
 }

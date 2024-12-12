@@ -6,6 +6,7 @@ import { Box, Button, Editable, EditableInput, EditablePreview, Flex, IconButton
 import { data, i } from 'framer-motion/client'
 import { useRef, useState } from 'react'
 import CardList from './CardList'
+import { useTranslation } from 'next-i18next'
 
 interface IProps {
 	index: number
@@ -17,6 +18,7 @@ interface IProps {
 }
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 const Column = ({ title, index, cards, color, editor, isLast }: IProps) => {
+	const { t } = useTranslation('common')
 	const [isAdding, setIsAdding] = useState(false)
 	const [newCard, setNewCard] = useState('')
 	const [inColumnTitleEdit, setInColumnTitleEdit] = useState(false)
@@ -79,7 +81,7 @@ const Column = ({ title, index, cards, color, editor, isLast }: IProps) => {
 						<Flex py="5px">
 							<Input
 								ref={ref}
-								placeholder="カード名"
+								placeholder={t('cardName')}
 								size="md"
 								backgroundColor="white"
 								borderRadius="8px"
@@ -88,14 +90,14 @@ const Column = ({ title, index, cards, color, editor, isLast }: IProps) => {
 								onChange={(e) => setNewCard(e.target.value)}
 							/>
 							<Button size="md" ml="3px" leftIcon={<AddIcon />} type="submit" onClick={() => add()}>
-								追加
+								{t('add')}
 							</Button>
 						</Flex>
 					</form>
 				) : (
 					<Box py="5px">
 						<Button size="md" w="100%" leftIcon={<AddIcon />} onClick={() => addToggle()}>
-							カードを追加
+							{t('addCard')}
 						</Button>
 					</Box>
 				)}

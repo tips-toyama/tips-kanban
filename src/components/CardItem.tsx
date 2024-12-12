@@ -2,6 +2,8 @@
 import type { ICard, IEditor } from '@/types'
 import { CopyIcon, DeleteIcon, DragHandleIcon } from '@chakra-ui/icons'
 import { Box, Button, Flex, IconButton, Text } from '@chakra-ui/react'
+import { t } from 'i18next'
+import { useTranslation } from 'next-i18next'
 import React, { useState } from 'react'
 
 interface CardItemProps {
@@ -13,6 +15,7 @@ interface CardItemProps {
 }
 function CardItem(props: CardItemProps) {
 	const { card, isDragging, editor, index } = props
+	const { t } = useTranslation('common')
 	const [isContextMenuOpen, setIsContextMenuOpen] = useState(false)
 	const copyItem = () => {
 		editor.copyItem(card.id)
@@ -52,8 +55,8 @@ function CardItem(props: CardItemProps) {
 		>
 			<Text>{card.text}</Text>
 			{isContextMenuOpen && <Flex>
-				<IconButton title="複製" aria-label="Duplicate" mr={1} icon={<CopyIcon />} size="xs" onClick={() => copyItem()} />
-				<IconButton title="削除" aria-label="Delete" icon={<DeleteIcon />} size="xs" colorScheme="red" onClick={() => deleteItem()} />
+				<IconButton title={t('duplicate')} aria-label="Duplicate" mr={1} icon={<CopyIcon />} size="xs" onClick={() => copyItem()} />
+				<IconButton title={t('delete')} aria-label="Delete" icon={<DeleteIcon />} size="xs" colorScheme="red" onClick={() => deleteItem()} />
 			</Flex>}
 		</Flex>
 	)

@@ -26,6 +26,7 @@ import { useRef, useState } from 'react'
 import Column from './Column'
 import { Composer } from './Composer'
 import EditableText from './EditableText'
+import { useTranslation } from 'next-i18next'
 
 interface IProps {
 	id: string
@@ -36,6 +37,7 @@ interface IProps {
 	setLatest: IState<number>
 }
 export const Board = ({ id, columns, setColumns, initOrder, color, setLatest }: IProps) => {
+	const { t } = useTranslation('common')
 	const [width] = useWindowSize()
 	const [ordered, setOrdered] = useState(initOrder)
 	const [editingCard, setEditingCard] = useState<{ id: string; text: string; latest: number } | null>(null)
@@ -194,8 +196,8 @@ export const Board = ({ id, columns, setColumns, initOrder, color, setLatest }: 
 								<EditableText textProps={{ fontSize: 32 }} defaultValue={editingCard.text} onBlur={(e) => cardTitleUpdate(editingCard.id, e.target.value, editingCard.text)} />
 								{!modalLoading && (
 									<Flex mr="24px" pos="relative" >
-										<IconButton title="複製" size="xs" onClick={() => editor.copyItem(editingCard.id)} icon={<CopyIcon />} aria-label="Copy this card" />
-										<IconButton title="削除" size="xs" ml={1} colorScheme="red" onClick={() => editor.deleteItem(editingCard.id)} icon={<DeleteIcon />} aria-label="Delete this card" />
+										<IconButton title={t('duplicate')} size="xs" onClick={() => editor.copyItem(editingCard.id)} icon={<CopyIcon />} aria-label="Copy this card" />
+										<IconButton title={t('delete')} size="xs" ml={1} colorScheme="red" onClick={() => editor.deleteItem(editingCard.id)} icon={<DeleteIcon />} aria-label="Delete this card" />
 									</Flex>
 								)}
 							</Flex>
@@ -223,11 +225,11 @@ export const Board = ({ id, columns, setColumns, initOrder, color, setLatest }: 
 						<Column key={key} index={index} title={key} cards={columns[key]} isLast={index === ordered.length - 1} color={color} editor={editor} />
 					))}
 					<Box backgroundColor="white" border="1px solid" borderColor="gray.300" borderRadius={5} p={5} flexShrink={0} height={100}>
-						<Text>カラムを追加</Text>
+						<Text>{t('addColumn')}</Text>
 						<Flex>
 							<Input value={newColumn} onChange={(e) => setNewColumn(e.target.value)} />
 							<Button ml={2} variant="outline" onClick={() => addColumn()}>
-								追加
+								{t('add')}
 							</Button>
 						</Flex>
 					</Box>

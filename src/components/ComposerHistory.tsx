@@ -8,6 +8,7 @@ import { findUser } from '@/utils/search'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import 'dayjs/locale/ja'
+import { useTranslation } from 'next-i18next'
 dayjs.extend(relativeTime)
 
 interface IProps {
@@ -17,23 +18,9 @@ interface IProps {
 //const interval = 3000000
 const interval = 60000
 
-const actionJa = {
-    changeContent: 'テキストを変更しました',
-    cardTitleUpdate: 'カード名を変更しました',
-    delete: 'カードを削除しました',
-    add: 'このカードを追加しました',
-    move: 'このカラムに移動させました',
-    changeCheckList: 'チェックリストを変更しました',
-    doCheckList: 'チェックリストを完了/解除しました',
-    changeColumnTitle: 'カラム名を変更しました',
-    moveColumn: '列を移動させました',
-    addColumn: '列を追加しました',
-    content: 'テキストを変更しました',
-    addAttachment: '添付ファイルを追加しました',
-    copy: '複製しました',
-}
 export const ComposerHistory = ({ id, userList }: IProps) => {
     const [histories, setHistories] = useState<IHistory[]>([])
+	const { t } = useTranslation('common')
     const fetchHistories = async () => {
         const res = await fetch(`/api/history?id=${id}`)
         const data = await res.json()
@@ -49,13 +36,13 @@ export const ComposerHistory = ({ id, userList }: IProps) => {
     return (
         <Box>
             {histories.length > 0 && <Text fontWeight="bold" fontSize={22} my={2}>
-                操作履歴
+                {t('history')}
             </Text>}
             {histories.map((c) => (
                 <Flex key={c.id}>
                     <Box w="100%">
                         <Flex w="100%">
-                            <Text>{findUser(userList, c.owner)?.name}さんが{actionJa[c.action]}。</Text>
+                            <Text>{t('historyBase', { name: findUser(userList, c.owner)?.name, action: t(`action.${c.action}`)})}</Text>
                             <Text fontSize={14} color="gray.500">
                                 {dayjs(c.createdAtUnix * 1000).locale('ja').fromNow()}({dayjs(c.createdAtUnix * 1000).format('YYYY/MM/DD HH:mm')})
                             </Text>
