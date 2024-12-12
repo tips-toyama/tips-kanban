@@ -83,10 +83,10 @@ export default function Home({ id }: { id: string }) {
 									{t('logout')}
 								</Button>
 								<Flex mt={2}>
-									<NextLink href={`/board/${id}`} locale="en">
+									<NextLink href="/" locale="en">
 										<Button variant="link" isDisabled={router.locale === 'en'}>English</Button>
 									</NextLink>
-									<NextLink href={`/board/${id}`} locale="ja">
+									<NextLink href="/" locale="ja">
 										<Button ml={2} variant="link" isDisabled={router.locale === 'ja'}>日本語</Button>
 									</NextLink>
 								</Flex>
