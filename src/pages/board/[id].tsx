@@ -35,7 +35,7 @@ export default function Home({ id }: { id: string }) {
 			const res = await fetch(`/api/board/get?id=${id}`)
 			const data = await res.json()
 			setLatest((c) => {
-				setHasLatest(data.version !== c)
+				if (c > 0) setHasLatest(data.version !== c)
 				return data.version
 			})
 			if (!silent) {

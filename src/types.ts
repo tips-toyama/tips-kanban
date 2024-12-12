@@ -61,6 +61,7 @@ export interface IComment {
 	id: string
 	owner: string
 	text: string
+	createdAtUnix: number
 }
 export interface ICheckList {
 	id: string

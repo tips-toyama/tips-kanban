@@ -25,6 +25,7 @@ import {
 import Link from 'next/link'
 import { ComposerCheckList } from './ComposerCheckList'
 import { ComposerComment } from './ComposerComment'
+import { ComposerHistory } from './ComposerHistory'
 
 interface IProps {
 	data: ICardDetails
@@ -50,9 +51,13 @@ export const Composer = ({ data: initData, id, cardProgressUpdate, color, latest
 	const [content, setContent] = useState(data.content)
 	const [hasNewCardData, setHasNewCardData] = useState(false)
 	const getUsers = async () => {
-		const res = await fetch('/api/user')
-		const data = await res.json()
-		setUserMap(data)
+		try {
+			const res = await fetch('/api/user')
+			const data = await res.json()
+			setUserMap(data)
+		} catch {
+			console.error('Failed to fetch users')
+		}
 	}
 	const fn = async (silent: boolean) => {
 		try {
@@ -68,7 +73,9 @@ export const Composer = ({ data: initData, id, cardProgressUpdate, color, latest
 				setContent(data.data.content)
 				setHasNewCardData(false)
 			}
-		} catch {}
+		} catch {
+			console.error('Failed to fetch card')
+		}
 	}
 	const uplaodFn = async (e: React.ChangeEvent<HTMLInputElement>) => {
 		const files: FileList | null = e.target.files
@@ -149,7 +156,7 @@ export const Composer = ({ data: initData, id, cardProgressUpdate, color, latest
 				color={color}
 				cardProgressUpdate={cardProgressUpdate}
 			/>
-			<Text fontWeight="bold" fontSize={22} mb={2}>
+			<Text fontWeight="bold" fontSize={22} my={2}>
 				添付ファイル
 			</Text>
 			{isUploading ? <Skeleton h="40px" /> : <Input type="file" isDisabled={isUpdating} pt={1} m={0} h="40px" onChange={(e) => uplaodFn(e)} />}
@@ -176,6 +183,7 @@ export const Composer = ({ data: initData, id, cardProgressUpdate, color, latest
 				</Box>
 			))}
 			<ComposerComment latest={latest} setLatest={setLatest} isUpdating={isUpdating} setIsUpdating={setIsUpdating} userList={userMap} id={id} />
+			<ComposerHistory userList={userMap} id={id} />
 			<style>{`.mdxeditor-popup-container{ z-index:9999; }
             .markdownEditor h1 { font-weight: bold; font-size: 2rem;}
             .markdownEditor h2 { font-weight: bold; font-size: 1.75rem;}

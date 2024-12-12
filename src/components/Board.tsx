@@ -8,9 +8,6 @@ import { CopyIcon, DeleteIcon } from '@chakra-ui/icons'
 import {
 	Box,
 	Button,
-	Editable,
-	EditableInput,
-	EditablePreview,
 	Flex,
 	IconButton,
 	Input,
@@ -18,7 +15,6 @@ import {
 	ModalBody,
 	ModalCloseButton,
 	ModalContent,
-	ModalFooter,
 	ModalHeader,
 	ModalOverlay,
 	Spinner,
@@ -26,7 +22,7 @@ import {
 	useDisclosure,
 } from '@chakra-ui/react'
 import type React from 'react'
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import Column from './Column'
 import { Composer } from './Composer'
 import EditableText from './EditableText'

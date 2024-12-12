@@ -5,6 +5,10 @@ import { Box, Button, Flex, Input, Text } from '@chakra-ui/react'
 import React, { useEffect, useState } from 'react'
 import '@mdxeditor/editor/style.css'
 import { findUser } from '@/utils/search'
+import dayjs from 'dayjs'
+import relativeTime from 'dayjs/plugin/relativeTime'
+import 'dayjs/locale/ja'
+dayjs.extend(relativeTime)
 
 interface IProps {
 	id: string
@@ -56,7 +60,7 @@ export const ComposerComment = ({ id, userList, isUpdating, setIsUpdating }: IPr
 				<Flex key={c.id}>
 					<Box w="100%">
 						<Text fontSize={14} color="gray.500">
-							{findUser(userList, c.owner)?.name}
+							{findUser(userList, c.owner)?.name} {dayjs(c.createdAtUnix * 1000).locale('ja').fromNow()}
 						</Text>
 						<Box p={3} w="100%" borderRadius={10} bgColor="gray.50">
 							<Text>{c.text}</Text>
