@@ -11,6 +11,7 @@ import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
+import Avatar from 'boring-avatars'
 
 export default function Home({ id }: { id: string }) {
 	const { t } = useTranslation('common')
@@ -72,7 +73,7 @@ export default function Home({ id }: { id: string }) {
 					</Flex>
 					<Popover>
 						<PopoverTrigger>
-							<IconButton icon={<SettingsIcon />} aria-label="edit" ml={2} variant="outline" size="xs" colorScheme="whiteAlpha" color="white" />
+							<Avatar style={{ cursor: 'pointer'}} name={session?.user?.name || ''} size={30} variant="beam" />
 						</PopoverTrigger>
 						<PopoverContent color="black">
 							<PopoverArrow />

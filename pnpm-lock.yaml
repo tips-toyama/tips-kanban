@@ -35,6 +35,9 @@ importers:
       '@types/react-dom':
         specifier: 19.0.1
         version: 19.0.1
+      boring-avatars:
+        specifier: ^1.11.2
+        version: 1.11.2
       dayjs:
         specifier: ^1.11.13
         version: 1.11.13
@@ -2477,6 +2480,9 @@ packages:
 
   bignumber.js@9.1.2:
     resolution: {integrity: sha512-2/mKyZH9K85bzOEfhXDBFZTGd1CTs+5IHpeFQo9luiBG7hghdC851Pj2WAhb6E3R6b9tZj/XKhbg4fum+Kepug==}
+
+  boring-avatars@1.11.2:
+    resolution: {integrity: sha512-3+wkwPeObwS4R37FGXMYViqc4iTrIRj5yzfX9Qy4mnpZ26sX41dGMhsAgmKks1r/uufY1pl4vpgzMWHYfJRb2A==}
 
   brace-expansion@1.1.11:
     resolution: {integrity: sha512-iCuPHDFgrHX7H2vEI/5xpz07zSHB00TpugqhmYtVmMO6518mCuRMoOYFldEBl0g187ufozdaHgWKcYFb61qGiA==}
@@ -7792,6 +7798,8 @@ snapshots:
   big.js@5.2.2: {}
 
   bignumber.js@9.1.2: {}
+
+  boring-avatars@1.11.2: {}
 
   brace-expansion@1.1.11:
     dependencies:

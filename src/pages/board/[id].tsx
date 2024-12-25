@@ -13,6 +13,7 @@ import NextLink from 'next/link'
 import { useRouter } from 'next/router'
 
 import { useEffect, useState } from 'react'
+import Avatar from 'boring-avatars'
 const interval = 3000000
 //const interval = 3000
 export default function Home({ id }: { id: string }) {
@@ -165,7 +166,7 @@ export default function Home({ id }: { id: string }) {
 					</Flex>
 					<Popover>
 						<PopoverTrigger>
-							<IconButton icon={<SettingsIcon />} aria-label="edit" ml={2} variant="outline" size="xs" colorScheme="whiteAlpha" color="white" />
+							<Avatar style={{ cursor: 'pointer'}} name={session?.user?.name || ''} size={30} variant="beam" />
 						</PopoverTrigger>
 						<PopoverContent color="black">
 							<PopoverArrow />
