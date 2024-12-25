@@ -3,7 +3,7 @@ import { Board } from '@/components/Board'
 import type { IBoard, IBoardMetaState, IUser } from '@/types'
 import { updateMeta } from '@/utils/update'
 import { ArrowBackIcon, CheckIcon, EditIcon, SettingsIcon } from '@chakra-ui/icons'
-import { Box, Button, Flex, IconButton, Input, Popover, PopoverArrow, PopoverBody, PopoverCloseButton, PopoverContent, PopoverTrigger, Radio, RadioGroup, Spinner, Stack, Text, useToast } from '@chakra-ui/react'
+import { Avatar, Box, Button, Flex, IconButton, Input, Popover, PopoverArrow, PopoverBody, PopoverCloseButton, PopoverContent, PopoverTrigger, Radio, RadioGroup, Spinner, Stack, Text, useToast } from '@chakra-ui/react'
 import type { GetServerSideProps } from 'next'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
@@ -13,7 +13,6 @@ import NextLink from 'next/link'
 import { useRouter } from 'next/router'
 
 import { useEffect, useState } from 'react'
-import Avatar from 'boring-avatars'
 const interval = 3000000
 //const interval = 3000
 export default function Home({ id }: { id: string }) {
@@ -31,7 +30,7 @@ export default function Home({ id }: { id: string }) {
 	const [hasLatest, setHasLatest] = useState(false)
 	const [isLoading, setIsLoading] = useState(false)
 	const [order, setOrder] = useState<string[]>([])
-	
+
 	const [userMap, setUserMap] = useState<IUser[]>([])
 	const [latest, setLatest] = useState(0)
 
@@ -180,7 +179,7 @@ export default function Home({ id }: { id: string }) {
 					</Flex>
 					<Popover>
 						<PopoverTrigger>
-							<Avatar style={{ cursor: 'pointer' }} name={session?.user?.name || ''} size={30} variant="beam" />
+							<Avatar cursor="pointer" name={session?.user?.name || ''} size="xs" />
 						</PopoverTrigger>
 						<PopoverContent color="black">
 							<PopoverArrow />

@@ -6,6 +6,7 @@ import { addCardUpdate, updateBoard as update } from '@/utils/update'
 import { useWindowSize } from '@/utils/useWindowSize'
 import { AddIcon, ArrowBackIcon, ChevronDownIcon, CopyIcon, DeleteIcon, Icon } from '@chakra-ui/icons'
 import {
+	Avatar,
 	AvatarGroup,
 	Box,
 	Button,
@@ -33,7 +34,6 @@ import { Composer } from './Composer'
 import EditableText from './EditableText'
 import { useTranslation } from 'next-i18next'
 import UserIcon from './UserIcon'
-import Avatar from 'boring-avatars'
 
 interface IProps {
 	id: string
@@ -234,7 +234,7 @@ export const Board = ({ id, columns, setColumns, initOrder, color, setLatest, us
 									<MenuButton as={IconButton} ml={1} icon={<AddIcon />} isDisabled={userEditingMode} size="xs" aria-label="add user" />
 									<MenuList zIndex={1000}>
 										{userMap.map((user) => <MenuItem key={user.name} onClick={() => cardUserUpdate('add', editingCard.id, user.id)}>
-											<Avatar name={user.name} size="1rem" variant="beam" />
+											<Avatar name={user.name} size="xs" />
 											<Text ml={2} fontSize="1rem">{user.name}</Text>
 										</MenuItem>)}
 									</MenuList>

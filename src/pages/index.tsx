@@ -1,7 +1,7 @@
 'use client'
 import type { IBoardMeta } from '@/types'
 import { CheckIcon, RepeatIcon, SettingsIcon } from '@chakra-ui/icons'
-import { Box, Button, Flex, IconButton, Input, Popover, PopoverArrow, PopoverBody, PopoverCloseButton, PopoverContent, PopoverTrigger, Radio, RadioGroup, Spinner, Stack, Text, color } from '@chakra-ui/react'
+import { Avatar, Box, Button, Flex, IconButton, Input, Popover, PopoverArrow, PopoverBody, PopoverCloseButton, PopoverContent, PopoverTrigger, Radio, RadioGroup, Spinner, Stack, Text, color } from '@chakra-ui/react'
 import type { GetServerSideProps } from 'next'
 import { getServerSession } from 'next-auth'
 import { signOut, useSession } from 'next-auth/react'
@@ -11,7 +11,6 @@ import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
-import Avatar from 'boring-avatars'
 
 export default function Home({ id }: { id: string }) {
 	const { t } = useTranslation('common')
@@ -73,7 +72,7 @@ export default function Home({ id }: { id: string }) {
 					</Flex>
 					<Popover>
 						<PopoverTrigger>
-							<Avatar style={{ cursor: 'pointer'}} name={session?.user?.name || ''} size={30} variant="beam" />
+							<Avatar cursor="pointer" name={session?.user?.name || ''} size="xs" />
 						</PopoverTrigger>
 						<PopoverContent color="black">
 							<PopoverArrow />
