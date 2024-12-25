@@ -19,7 +19,6 @@ export const authOptions: AuthOptions = {
 	providers: [provider],
 	callbacks: {
 		signIn: async ({ user }: any) => {
-			console.log('signIn', user)
 			if (admin.apps.length === 0) {
 				admin.initializeApp({
 					credential: admin.credential.cert({

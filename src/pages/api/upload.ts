@@ -28,7 +28,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
 	await file.save(Buffer.from(body.data, 'base64'))
 	await file.makePublic()
 	const url = file.publicUrl()
-	console.log(url)
 	res.status(200).json({ url })
 }
 export const config = {

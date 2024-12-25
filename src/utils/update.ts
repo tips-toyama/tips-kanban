@@ -90,7 +90,6 @@ export const upload = async (file: File) => {
 				},
 			})
 			const r = await d.json()
-			console.log(r)
 			return r.url
 		}
 	} catch (e) {
