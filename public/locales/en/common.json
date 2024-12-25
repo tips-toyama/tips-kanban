@@ -22,6 +22,11 @@
     "comment": "Comment",
     "send": "Send",
     "addComment": "Add Comment",
+    "filter": "Filter",
+    "mine": "Assigned to me",
+    "others": "Assigned to others",
+    "orphan": "Unassigned",
+    "noAssigned": "No assigned member",
     "history": "History",
     "historyBase": "{{name}} {{action}}.",
     "action": {
@@ -37,6 +42,7 @@
         "addColumn": "added this column",
         "content": "changed the text of this card",
         "addAttachment": "added an attachment",
-        "copy": "duplicated this card"
+        "copy": "duplicated this card",
+        "cardUserUpdate": "changed the assignee"
     }
 }

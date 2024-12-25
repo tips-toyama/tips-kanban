@@ -1,11 +1,12 @@
 'use client'
 
-import type { ICard, IEditor, IUser } from '@/types'
+import type { ICard, IEditor, IFilter, IUser } from '@/types'
 import { AddIcon, ChevronLeftIcon, ChevronRightIcon } from '@chakra-ui/icons'
 import { Box, Button, Flex, IconButton, Input } from '@chakra-ui/react'
 import { useRef, useState } from 'react'
 import CardList from './CardList'
 import { useTranslation } from 'next-i18next'
+import type { Session } from 'next-auth'
 
 interface IProps {
 	index: number
@@ -15,9 +16,11 @@ interface IProps {
 	editor: IEditor
 	isLast: boolean
 	userMap: IUser[]
+	session: Session | null
+	filter: IFilter[]
 }
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
-const Column = ({ title, index, cards, color, editor, isLast, userMap }: IProps) => {
+const Column = ({ title, index, cards, color, editor, isLast, userMap, session, filter }: IProps) => {
 	const { t } = useTranslation('common')
 	const [isAdding, setIsAdding] = useState(false)
 	const [newCard, setNewCard] = useState('')
@@ -75,7 +78,7 @@ const Column = ({ title, index, cards, color, editor, isLast, userMap }: IProps)
 				/>
 			</Flex>
 			<Box backgroundColor="gray.200" borderBottomRadius="8px" maxH="100%" p="8px">
-				<CardList listId={title} title={title} listType="CARD" editor={editor} cards={cards} userMap={userMap} />
+				<CardList listId={title} title={title} editor={editor} cards={cards} userMap={userMap} session={session} filter={filter} />
 				{isAdding ? (
 					<form>
 						<Flex py="5px">

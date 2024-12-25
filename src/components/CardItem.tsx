@@ -1,8 +1,8 @@
 'use client'
 import type { ICard, IEditor, IUser } from '@/types'
-import { CheckCircleIcon, CopyIcon, DeleteIcon, CheckIcon } from '@chakra-ui/icons'
-import { AvatarGroup, Box, Button, Flex, IconButton, Text } from '@chakra-ui/react'
-import { t } from 'i18next'
+import { CopyIcon, DeleteIcon } from '@chakra-ui/icons'
+import { IoCheckboxOutline } from 'react-icons/io5'
+import { AvatarGroup, Box, Flex, IconButton, Text, Icon } from '@chakra-ui/react'
 import { useTranslation } from 'next-i18next'
 import React, { useState } from 'react'
 import UserIcon from './UserIcon'
@@ -63,7 +63,7 @@ function CardItem(props: CardItemProps) {
 			</Flex>
 			<Flex align="center">
 				{(card.checkList || 0) > 0 && <Flex>
-					<CheckCircleIcon />
+					<Icon as={IoCheckboxOutline} />
 					<Text>{card.checkListDone}/{card.checkList}</Text>
 				</Flex>}
 				{(card.assigned && card.assigned.length > 0) && <AvatarGroup size="xs" max={5}>{card.assigned.map((user) => <UserIcon key={user} user={user} userMap={props.userMap} size="xs" />)}</AvatarGroup>}

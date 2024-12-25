@@ -2,7 +2,7 @@
 import { Board } from '@/components/Board'
 import type { IBoard, IBoardMetaState, IUser } from '@/types'
 import { updateMeta } from '@/utils/update'
-import { ArrowBackIcon, CheckIcon, EditIcon, SettingsIcon } from '@chakra-ui/icons'
+import { ArrowBackIcon, CheckIcon, EditIcon } from '@chakra-ui/icons'
 import { Avatar, Box, Button, Flex, IconButton, Input, Popover, PopoverArrow, PopoverBody, PopoverCloseButton, PopoverContent, PopoverTrigger, Radio, RadioGroup, Spinner, Stack, Text, useToast } from '@chakra-ui/react'
 import type { GetServerSideProps } from 'next'
 import { useTranslation } from 'next-i18next'
@@ -17,7 +17,6 @@ const interval = 3000000
 //const interval = 3000
 export default function Home({ id }: { id: string }) {
 	const { t } = useTranslation('common')
-	const toast = useToast()
 	const router = useRouter()
 	const { data: session, status } = useSession()
 	if (status === 'unauthenticated') {
@@ -211,7 +210,7 @@ export default function Home({ id }: { id: string }) {
 				)}
 				{!!columns ? (
 					<Box h="100svh" position="relative">
-						<Board id={id} columns={columns} initOrder={order} setColumns={setColumns} color={meta?.color || 'blue'} setLatest={setLatest} userMap={userMap} />
+						<Board id={id} columns={columns} initOrder={order} setColumns={setColumns} color={meta?.color || 'blue'} setLatest={setLatest} userMap={userMap} session={session} />
 					</Box>
 				) : (
 					<Flex w="100vw" h="100svh" justify="center" align="center">

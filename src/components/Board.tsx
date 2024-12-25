@@ -1,16 +1,20 @@
 'use client'
 
-import type { IBoard, ICard, ICardDetails, IState, IUser } from '@/types'
+import type { IBoard, ICard, ICardDetails, IFilter, IState, IUser } from '@/types'
 import { findColumn } from '@/utils/search'
 import { addCardUpdate, updateBoard as update } from '@/utils/update'
 import { useWindowSize } from '@/utils/useWindowSize'
-import { AddIcon, ArrowBackIcon, ChevronDownIcon, CopyIcon, DeleteIcon, Icon } from '@chakra-ui/icons'
+import { ArrowBackIcon, CheckIcon, CopyIcon, DeleteIcon } from '@chakra-ui/icons'
+import { IoPersonAddOutline, IoPersonRemoveOutline } from 'react-icons/io5'
 import {
 	Avatar,
 	AvatarGroup,
 	Box,
 	Button,
+	Checkbox,
+	Divider,
 	Flex,
+	Icon,
 	IconButton,
 	Input,
 	Menu,
@@ -34,6 +38,7 @@ import { Composer } from './Composer'
 import EditableText from './EditableText'
 import { useTranslation } from 'next-i18next'
 import UserIcon from './UserIcon'
+import type { Session } from 'next-auth'
 
 interface IProps {
 	id: string
@@ -43,11 +48,12 @@ interface IProps {
 	initOrder: string[]
 	setColumns: IState<IBoard | null>
 	setLatest: IState<number>
+	session: Session | null
 }
 interface IEditingCard extends ICard {
 	latest: number
 }
-export const Board = ({ id, columns, setColumns, initOrder, color, setLatest, userMap }: IProps) => {
+export const Board = ({ id, columns, setColumns, initOrder, color, setLatest, userMap, session }: IProps) => {
 	const { t } = useTranslation('common')
 	const [width] = useWindowSize()
 	const [ordered, setOrdered] = useState(initOrder)
@@ -58,6 +64,7 @@ export const Board = ({ id, columns, setColumns, initOrder, color, setLatest, us
 	const [cardDetails, setCardDetails] = useState<ICardDetails | null>(null)
 	const [draggingCard, setDraggingCard] = useState('')
 	const [newColumn, setNewColumn] = useState('')
+	const [filter, setFilter] = useState<IFilter[]>(['mine', 'others', 'orphan'])
 	const ref = useRef<HTMLDivElement>(null)
 	const { isOpen, onOpen, onClose } = useDisclosure()
 
@@ -192,7 +199,7 @@ export const Board = ({ id, columns, setColumns, initOrder, color, setLatest, us
 		}
 		setColumns(newColumns)
 		update(id, setLatest, cardId, 'cardUserUpdate', newColumns)
-		if(editingCard) setEditingCard({ ...newColumns[targetKey][cardIndex], latest: editingCard?.latest || 0 })
+		if (editingCard) setEditingCard({ ...newColumns[targetKey][cardIndex], latest: editingCard?.latest || 0 })
 	}
 	const cardProgressUpdate = (cardId: string, checkList: number, checkListDone: number) => {
 		const { key: targetKey, cardIndex } = findColumn(columns, cardId)
@@ -229,9 +236,10 @@ export const Board = ({ id, columns, setColumns, initOrder, color, setLatest, us
 							</Flex>
 							<ModalCloseButton isDisabled={hasUnsavedChanges} mb={2} />
 							<Flex borderWidth={2} p={1} borderRadius={5} borderColor={userEditingMode ? 'red.200' : 'rgba(0,0,0,0)'}>
+								{(!editingCard.assigned || editingCard.assigned.length === 0) && <Text fontStyle="italic" fontSize="1rem">{t('noAssigned')}</Text>}
 								<AvatarGroup size="xs" max={15}>{editingCard.assigned?.map((user) => <UserIcon key={user} user={user} userMap={userMap} onClick={() => cardUserUpdate('delete', editingCard.id, user)} size="xs" deleteMode={userEditingMode} />)}</AvatarGroup>
 								<Menu>
-									<MenuButton as={IconButton} ml={1} icon={<AddIcon />} isDisabled={userEditingMode} size="xs" aria-label="add user" />
+									<MenuButton as={IconButton} ml={1} icon={<Icon as={IoPersonAddOutline} />} isDisabled={userEditingMode} size="xs" aria-label="add user" />
 									<MenuList zIndex={1000}>
 										{userMap.map((user) => <MenuItem key={user.name} onClick={() => cardUserUpdate('add', editingCard.id, user.id)}>
 											<Avatar name={user.name} size="xs" />
@@ -239,7 +247,7 @@ export const Board = ({ id, columns, setColumns, initOrder, color, setLatest, us
 										</MenuItem>)}
 									</MenuList>
 								</Menu>
-								<IconButton ml={1} icon={userEditingMode ? <ArrowBackIcon /> : <DeleteIcon />} colorScheme="red" isDisabled={!editingCard.assigned || editingCard.assigned.length === 0} variant="ghost" size="xs" onClick={() => setUserEditingMode(!userEditingMode)} aria-label="delete user" />
+								<IconButton ml={1} icon={userEditingMode ? <CheckIcon /> : <Icon as={IoPersonRemoveOutline} />} colorScheme="red" isDisabled={!editingCard.assigned || editingCard.assigned.length === 0} variant="ghost" size="xs" onClick={() => setUserEditingMode(!userEditingMode)} aria-label="delete user" />
 							</Flex>
 						</ModalHeader>
 						<ModalBody>
@@ -261,9 +269,9 @@ export const Board = ({ id, columns, setColumns, initOrder, color, setLatest, us
 			<Box>
 				<Box h="calc(100svh - 50px)" w="100%" mt={3} display="inline-flex" overflowX="scroll" ref={ref}>
 					{ordered.map((key, index) => (
-						<Column key={key} index={index} title={key} cards={columns[key]} isLast={index === ordered.length - 1} color={color} editor={editor} userMap={userMap} />
+						<Column key={key} index={index} title={key} cards={columns[key]} isLast={index === ordered.length - 1} color={color} editor={editor} userMap={userMap} session={session} filter={filter} />
 					))}
-					<Box backgroundColor="white" border="1px solid" borderColor="gray.300" borderRadius={5} p={5} flexShrink={0} height={100}>
+					<Box backgroundColor="white" border="1px solid" borderColor="gray.300" borderRadius={5} p={5} flexShrink={0} height={220}>
 						<Text>{t('addColumn')}</Text>
 						<Flex>
 							<Input value={newColumn} onChange={(e) => setNewColumn(e.target.value)} />
@@ -271,9 +279,26 @@ export const Board = ({ id, columns, setColumns, initOrder, color, setLatest, us
 								{t('add')}
 							</Button>
 						</Flex>
+						<Divider my={2} />
+						<Text>{t('filter')}</Text>
+						<Box>
+							<Checkbox isChecked={filter.includes('mine')} colorScheme={color} onChange={(e) => setFilter(filter.includes('mine') ? filter.filter((f) => f !== 'mine') : [...filter, 'mine'])}>
+								{t('mine')}
+							</Checkbox>
+						</Box>
+						<Box>
+							<Checkbox isChecked={filter.includes('others')} colorScheme={color} onChange={(e) => setFilter(filter.includes('others') ? filter.filter((f) => f !== 'others') : [...filter, 'others'])}>
+								{t('others')}
+							</Checkbox>
+						</Box>
+						<Box>
+							<Checkbox isChecked={filter.includes('orphan')} colorScheme={color} onChange={(e) => setFilter(filter.includes('orphan') ? filter.filter((f) => f !== 'orphan') : [...filter, 'orphan'])}>
+								{t('orphan')}
+							</Checkbox>
+						</Box>
 					</Box>
 				</Box>
-			</Box>
+			</Box >
 		</>
 	)
 }

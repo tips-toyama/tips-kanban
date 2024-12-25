@@ -1,6 +1,6 @@
 'use client'
 import type { IBoardMeta } from '@/types'
-import { CheckIcon, RepeatIcon, SettingsIcon } from '@chakra-ui/icons'
+import { CheckIcon, RepeatIcon } from '@chakra-ui/icons'
 import { Avatar, Box, Button, Flex, IconButton, Input, Popover, PopoverArrow, PopoverBody, PopoverCloseButton, PopoverContent, PopoverTrigger, Radio, RadioGroup, Spinner, Stack, Text, color } from '@chakra-ui/react'
 import type { GetServerSideProps } from 'next'
 import { getServerSession } from 'next-auth'
@@ -62,7 +62,7 @@ export default function Home({ id }: { id: string }) {
 				<meta name="description" content="TIPS Kanvan" />
 				<meta name="viewport" content="width=device-width, initial-scale=1" />
 				<link rel="icon" href="/favicon.ico" />
-				<style>{'body { background-color: #eee; overflow: hidden;}'}</style>
+				<style>{'body { background-color: #eee; overflow: auto;}'}</style>
 			</Head>
 			<Box>
 				<Flex h="40px" backgroundColor="blue.500" w="100vw" color="white" align="center" px="10px" justify="space-between">
@@ -98,7 +98,7 @@ export default function Home({ id }: { id: string }) {
 					<Text fontSize={22}>{t('greeting', { name: session?.user?.name })}</Text>
 					<IconButton icon={<RepeatIcon />} aria-label="refresh" onClick={() => init()} />
 				</Flex>
-				<Flex flexWrap="wrap" px={5}>
+				<Flex flexWrap="wrap" px={5} overflowY="scroll">
 					{boards.map((b, i) => (
 						<NextLink key={b.id} href={`/board/${b.id}`}>
 							<Box m={3} p={3} bgColor="white" w={150} h={150} backgroundColor={`${b.color}.500`} color="white" borderRadius={5} my={2}>

@@ -22,6 +22,11 @@
     "comment": "コメント",
     "send": "送信",
     "addComment": "コメントを入力",
+    "filter": "絞り込み",
+    "mine": "自分に割り当て",
+    "others": "他の人に割り当て",
+    "orphan": "未割り当て",
+    "noAssigned": "メンバー割り当てなし",
     "history": "操作履歴",
     "historyBase": "{{name}}さんが{{action}}。",
     "action": {
@@ -37,6 +42,7 @@
         "addColumn": "列を追加しました",
         "content": "テキストを変更しました",
         "addAttachment": "添付ファイルを追加しました",
-        "copy": "複製しました"
+        "copy": "複製しました",
+        "cardUserUpdate": "担当者を変更しました"
     }
 }

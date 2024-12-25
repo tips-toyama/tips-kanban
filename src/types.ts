@@ -19,6 +19,7 @@ export interface IBoard {
 	[key: string]: ICard[]
 }
 export type IState<T> = (value: React.SetStateAction<T>) => void
+export type IFilter = 'mine' | 'others' | 'orphan'
 export type IEditor = {
 	openModal: (card: ICard) => void
 	add: (target: string, title: string) => void
