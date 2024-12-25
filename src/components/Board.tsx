@@ -1,16 +1,21 @@
 'use client'
 
-import type { IBoard, ICard, ICardDetails, IState } from '@/types'
+import type { IBoard, ICard, ICardDetails, IState, IUser } from '@/types'
 import { findColumn } from '@/utils/search'
 import { addCardUpdate, updateBoard as update } from '@/utils/update'
 import { useWindowSize } from '@/utils/useWindowSize'
-import { CopyIcon, DeleteIcon } from '@chakra-ui/icons'
+import { AddIcon, ArrowBackIcon, ChevronDownIcon, CopyIcon, DeleteIcon, Icon } from '@chakra-ui/icons'
 import {
+	AvatarGroup,
 	Box,
 	Button,
 	Flex,
 	IconButton,
 	Input,
+	Menu,
+	MenuButton,
+	MenuItem,
+	MenuList,
 	Modal,
 	ModalBody,
 	ModalCloseButton,
@@ -27,21 +32,28 @@ import Column from './Column'
 import { Composer } from './Composer'
 import EditableText from './EditableText'
 import { useTranslation } from 'next-i18next'
+import UserIcon from './UserIcon'
+import Avatar from 'boring-avatars'
 
 interface IProps {
 	id: string
+	userMap: IUser[]
 	columns: IBoard
 	color: string
 	initOrder: string[]
 	setColumns: IState<IBoard | null>
 	setLatest: IState<number>
 }
-export const Board = ({ id, columns, setColumns, initOrder, color, setLatest }: IProps) => {
+interface IEditingCard extends ICard {
+	latest: number
+}
+export const Board = ({ id, columns, setColumns, initOrder, color, setLatest, userMap }: IProps) => {
 	const { t } = useTranslation('common')
 	const [width] = useWindowSize()
 	const [ordered, setOrdered] = useState(initOrder)
-	const [editingCard, setEditingCard] = useState<{ id: string; text: string; latest: number } | null>(null)
+	const [editingCard, setEditingCard] = useState<IEditingCard | null>(null)
 	const [modalLoading, setModalLoading] = useState(false)
+	const [userEditingMode, setUserEditingMode] = useState(false)
 	const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
 	const [cardDetails, setCardDetails] = useState<ICardDetails | null>(null)
 	const [draggingCard, setDraggingCard] = useState('')
@@ -55,6 +67,7 @@ export const Board = ({ id, columns, setColumns, initOrder, color, setLatest }: 
 				onOpen()
 				setModalLoading(true)
 				setEditingCard(null)
+				setUserEditingMode(false)
 				try {
 					const res = await fetch(`/api/card/get?id=${card.id}`)
 					const data = await res.json()
@@ -159,14 +172,27 @@ export const Board = ({ id, columns, setColumns, initOrder, color, setLatest }: 
 		},
 	}
 	const cardTitleUpdate = (cardId: string, newTitle: string, oldValue: string) => {
-		if (newTitle === oldValue) return
-		setEditingCard({ id: cardId, text: newTitle, latest: editingCard?.latest || 0 })
+		if (newTitle === oldValue || !editingCard) return
+		setEditingCard({ ...editingCard, text: newTitle, latest: editingCard?.latest || 0 })
 		const { key: targetKey, cardIndex } = findColumn(columns, cardId)
 		const newColumns = { ...columns }
 		if (!targetKey) return
 		newColumns[targetKey][cardIndex].text = newTitle
 		setColumns(newColumns)
 		update(id, setLatest, cardId, 'cardTitleUpdate', newColumns)
+	}
+	const cardUserUpdate = (mode: 'add' | 'delete', cardId: string, userId: string) => {
+		const { key: targetKey, cardIndex } = findColumn(columns, cardId)
+		const newColumns = { ...columns }
+		if (!targetKey) return
+		if (mode === 'add') {
+			newColumns[targetKey][cardIndex].assigned = newColumns[targetKey][cardIndex].assigned ? [...newColumns[targetKey][cardIndex].assigned, userId] : [userId]
+		} else {
+			newColumns[targetKey][cardIndex].assigned = newColumns[targetKey][cardIndex].assigned?.filter((u) => u !== userId)
+		}
+		setColumns(newColumns)
+		update(id, setLatest, cardId, 'cardUserUpdate', newColumns)
+		if(editingCard) setEditingCard({ ...newColumns[targetKey][cardIndex], latest: editingCard?.latest || 0 })
 	}
 	const cardProgressUpdate = (cardId: string, checkList: number, checkListDone: number) => {
 		const { key: targetKey, cardIndex } = findColumn(columns, cardId)
@@ -202,10 +228,23 @@ export const Board = ({ id, columns, setColumns, initOrder, color, setLatest }: 
 								)}
 							</Flex>
 							<ModalCloseButton isDisabled={hasUnsavedChanges} mb={2} />
+							<Flex borderWidth={2} p={1} borderRadius={5} borderColor={userEditingMode ? 'red.200' : 'rgba(0,0,0,0)'}>
+								<AvatarGroup size="xs" max={15}>{editingCard.assigned?.map((user) => <UserIcon key={user} user={user} userMap={userMap} onClick={() => cardUserUpdate('delete', editingCard.id, user)} size="xs" deleteMode={userEditingMode} />)}</AvatarGroup>
+								<Menu>
+									<MenuButton as={IconButton} ml={1} icon={<AddIcon />} isDisabled={userEditingMode} size="xs" aria-label="add user" />
+									<MenuList zIndex={1000}>
+										{userMap.map((user) => <MenuItem key={user.name} onClick={() => cardUserUpdate('add', editingCard.id, user.id)}>
+											<Avatar name={user.name} size="1rem" variant="beam" />
+											<Text ml={2} fontSize="1rem">{user.name}</Text>
+										</MenuItem>)}
+									</MenuList>
+								</Menu>
+								<IconButton ml={1} icon={userEditingMode ? <ArrowBackIcon /> : <DeleteIcon />} colorScheme="red" isDisabled={!editingCard.assigned || editingCard.assigned.length === 0} variant="ghost" size="xs" onClick={() => setUserEditingMode(!userEditingMode)} aria-label="delete user" />
+							</Flex>
 						</ModalHeader>
 						<ModalBody>
 							{!modalLoading && cardDetails ? (
-								<Composer setHasUnsavedChanges={setHasUnsavedChanges} id={editingCard.id} data={cardDetails} cardProgressUpdate={cardProgressUpdate} color={color} latest={editingCard.latest} />
+								<Composer setHasUnsavedChanges={setHasUnsavedChanges} id={editingCard.id} data={cardDetails} cardProgressUpdate={cardProgressUpdate} color={color} latest={editingCard.latest} userMap={userMap} />
 							) : (
 								<Flex mb={10} justify="center" align="center">
 									<Spinner />
@@ -222,7 +261,7 @@ export const Board = ({ id, columns, setColumns, initOrder, color, setLatest }: 
 			<Box>
 				<Box h="calc(100svh - 50px)" w="100%" mt={3} display="inline-flex" overflowX="scroll" ref={ref}>
 					{ordered.map((key, index) => (
-						<Column key={key} index={index} title={key} cards={columns[key]} isLast={index === ordered.length - 1} color={color} editor={editor} />
+						<Column key={key} index={index} title={key} cards={columns[key]} isLast={index === ordered.length - 1} color={color} editor={editor} userMap={userMap} />
 					))}
 					<Box backgroundColor="white" border="1px solid" borderColor="gray.300" borderRadius={5} p={5} flexShrink={0} height={100}>
 						<Text>{t('addColumn')}</Text>

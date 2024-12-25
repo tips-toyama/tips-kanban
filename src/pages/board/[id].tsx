@@ -1,6 +1,6 @@
 'use client'
 import { Board } from '@/components/Board'
-import type { IBoard, IBoardMetaState } from '@/types'
+import type { IBoard, IBoardMetaState, IUser } from '@/types'
 import { updateMeta } from '@/utils/update'
 import { ArrowBackIcon, CheckIcon, EditIcon, SettingsIcon } from '@chakra-ui/icons'
 import { Box, Button, Flex, IconButton, Input, Popover, PopoverArrow, PopoverBody, PopoverCloseButton, PopoverContent, PopoverTrigger, Radio, RadioGroup, Spinner, Stack, Text, useToast } from '@chakra-ui/react'
@@ -31,7 +31,20 @@ export default function Home({ id }: { id: string }) {
 	const [hasLatest, setHasLatest] = useState(false)
 	const [isLoading, setIsLoading] = useState(false)
 	const [order, setOrder] = useState<string[]>([])
+	
+	const [userMap, setUserMap] = useState<IUser[]>([])
 	const [latest, setLatest] = useState(0)
+
+
+	const getUsers = async () => {
+		try {
+			const res = await fetch('/api/user')
+			const data = await res.json()
+			setUserMap(data)
+		} catch {
+			console.error('Failed to fetch users')
+		}
+	}
 	const init = async (silent: boolean) => {
 		setIsLoading(true)
 		setHasLatest(false)
@@ -69,6 +82,7 @@ export default function Home({ id }: { id: string }) {
 	}
 	useEffect(() => {
 		init(false)
+		getUsers()
 		const timer = setInterval(() => {
 			init(true)
 		}, interval)
@@ -166,7 +180,7 @@ export default function Home({ id }: { id: string }) {
 					</Flex>
 					<Popover>
 						<PopoverTrigger>
-							<Avatar style={{ cursor: 'pointer'}} name={session?.user?.name || ''} size={30} variant="beam" />
+							<Avatar style={{ cursor: 'pointer' }} name={session?.user?.name || ''} size={30} variant="beam" />
 						</PopoverTrigger>
 						<PopoverContent color="black">
 							<PopoverArrow />
@@ -198,7 +212,7 @@ export default function Home({ id }: { id: string }) {
 				)}
 				{!!columns ? (
 					<Box h="100svh" position="relative">
-						<Board id={id} columns={columns} initOrder={order} setColumns={setColumns} color={meta?.color || 'blue'} setLatest={setLatest} />
+						<Board id={id} columns={columns} initOrder={order} setColumns={setColumns} color={meta?.color || 'blue'} setLatest={setLatest} userMap={userMap} />
 					</Box>
 				) : (
 					<Flex w="100vw" h="100svh" justify="center" align="center">

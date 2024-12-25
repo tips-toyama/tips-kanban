@@ -30,37 +30,24 @@ import { useTranslation } from 'next-i18next'
 
 interface IProps {
 	data: ICardDetails
+	userMap: IUser[]
 	id: string
 	setHasUnsavedChanges: IState<boolean>
 	cardProgressUpdate: (id: string, checkList: number, checkListDone: number) => void
 	color: string
 	latest: number
 }
-const usersMock: IUser[] = [
-	{ id: 'user1', name: 'User 1' },
-	{ id: 'user2', name: 'User 2' },
-]
 const interval = 60000
 //const interval = 3000
-export const Composer = ({ data: initData, id, cardProgressUpdate, color, latest: initLatest, setHasUnsavedChanges }: IProps) => {
+export const Composer = ({ data: initData, id, cardProgressUpdate, color, latest: initLatest, setHasUnsavedChanges, userMap }: IProps) => {
 	const { t } = useTranslation('common')
 	const [latest, setLatest] = useState(initLatest)
 	const ref = React.useRef<MDXEditorMethods>(null)
 	const [data, setData] = useState<ICardDetails>(initData)
 	const [isUpdating, setIsUpdating] = useState(false)
 	const [isUploading, setIsUploading] = useState(false)
-	const [userMap, setUserMap] = useState<IUser[]>([])
 	const [content, setContent] = useState(data.content)
 	const [hasNewCardData, setHasNewCardData] = useState(false)
-	const getUsers = async () => {
-		try {
-			const res = await fetch('/api/user')
-			const data = await res.json()
-			setUserMap(data)
-		} catch {
-			console.error('Failed to fetch users')
-		}
-	}
 	const fn = async (silent: boolean) => {
 		try {
 			const res = await fetch(`/api/card/get?id=${id}`)
@@ -95,7 +82,6 @@ export const Composer = ({ data: initData, id, cardProgressUpdate, color, latest
 	}
 	useEffect(() => {
 		if (!initData) return
-		getUsers()
 		const timer = setInterval(() => {
 			fn(true)
 		}, interval)

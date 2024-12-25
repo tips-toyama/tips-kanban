@@ -1,4 +1,4 @@
-import type { ICard, IEditor } from '@/types'
+import type { ICard, IEditor, IUser } from '@/types'
 import { Box } from '@chakra-ui/react'
 import { useState } from 'react'
 import CardItem from './CardItem'
@@ -10,9 +10,10 @@ interface CardProps {
 	cards: ICard[]
 	title: string
 	editor: IEditor
+	userMap: IUser[]
 }
 export default function CardList(props: CardProps) {
-	const { listId = 'LIST', listType, cards, title, editor } = props
+	const { cards, title, editor, userMap } = props
 
 	return (
 		<Box display="flex" flexDir="column" paddingBottom={0} transition="background-color 0.2s ease, opacity 0.1s ease" userSelect="none" w="250px" maxH="calc(100svh - 150px)">
@@ -24,7 +25,7 @@ export default function CardList(props: CardProps) {
 						</Box>
 						{cards.map((card: ICard, index: number) => (
 							<Box position="relative" key={card.id}>
-								<CardItem isDragging={false} card={card} editor={editor} index={index} />
+								<CardItem isDragging={false} card={card} editor={editor} index={index} userMap={userMap} />
 								<Droppable target={title} index={index + 1} editor={editor} />
 							</Box>
 						))}

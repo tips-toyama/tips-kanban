@@ -1,10 +1,11 @@
 'use client'
-import type { ICard, IEditor } from '@/types'
-import { CopyIcon, DeleteIcon, DragHandleIcon } from '@chakra-ui/icons'
-import { Box, Button, Flex, IconButton, Text } from '@chakra-ui/react'
+import type { ICard, IEditor, IUser } from '@/types'
+import { CheckCircleIcon, CopyIcon, DeleteIcon, CheckIcon } from '@chakra-ui/icons'
+import { AvatarGroup, Box, Button, Flex, IconButton, Text } from '@chakra-ui/react'
 import { t } from 'i18next'
 import { useTranslation } from 'next-i18next'
 import React, { useState } from 'react'
+import UserIcon from './UserIcon'
 
 interface CardItemProps {
 	card: ICard
@@ -12,6 +13,7 @@ interface CardItemProps {
 	isClone?: boolean
 	index: number
 	editor: IEditor
+	userMap: IUser[]
 }
 function CardItem(props: CardItemProps) {
 	const { card, isDragging, editor, index } = props
@@ -27,7 +29,7 @@ function CardItem(props: CardItemProps) {
 	}
 
 	return (
-		<Flex
+		<Box
 			onClick={() => !isContextMenuOpen && editor.openModal(card)}
 			onContextMenu={(e) => {
 				e.preventDefault()
@@ -39,7 +41,6 @@ function CardItem(props: CardItemProps) {
 			marginBottom="8px"
 			borderRadius="8px"
 			transition="border 0.1s ease"
-			justify="space-between"
 			_hover={{ borderColor: 'gray.500' }}
 			backgroundColor="white"
 			data-is-dragging={isDragging}
@@ -53,12 +54,21 @@ function CardItem(props: CardItemProps) {
 			onDrag={(e) => editor.dragger(e, card.id)}
 			onDragEnd={(e) => editor.draggerEnd()}
 		>
-			<Text>{card.text}</Text>
-			{isContextMenuOpen && <Flex>
-				<IconButton title={t('duplicate')} aria-label="Duplicate" mr={1} icon={<CopyIcon />} size="xs" onClick={() => copyItem()} />
-				<IconButton title={t('delete')} aria-label="Delete" icon={<DeleteIcon />} size="xs" colorScheme="red" onClick={() => deleteItem()} />
-			</Flex>}
-		</Flex>
+			<Flex justify="space-between">
+				<Text>{card.text}</Text>
+				{isContextMenuOpen && <Flex>
+					<IconButton title={t('duplicate')} aria-label="Duplicate" mr={1} icon={<CopyIcon />} size="xs" onClick={() => copyItem()} />
+					<IconButton title={t('delete')} aria-label="Delete" icon={<DeleteIcon />} size="xs" colorScheme="red" onClick={() => deleteItem()} />
+				</Flex>}
+			</Flex>
+			<Flex align="center">
+				{(card.checkList || 0) > 0 && <Flex>
+					<CheckCircleIcon />
+					<Text>{card.checkListDone}/{card.checkList}</Text>
+				</Flex>}
+				{(card.assigned && card.assigned.length > 0) && <AvatarGroup size="xs" max={5}>{card.assigned.map((user) => <UserIcon key={user} user={user} userMap={props.userMap} size="xs" />)}</AvatarGroup>}
+			</Flex>
+		</Box>
 	)
 }
 

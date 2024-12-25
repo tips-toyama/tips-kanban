@@ -1,6 +1,6 @@
 'use client'
 
-import type { ICard, IEditor } from '@/types'
+import type { ICard, IEditor, IUser } from '@/types'
 import { AddIcon, ChevronLeftIcon, ChevronRightIcon } from '@chakra-ui/icons'
 import { Box, Button, Flex, IconButton, Input } from '@chakra-ui/react'
 import { useRef, useState } from 'react'
@@ -14,9 +14,10 @@ interface IProps {
 	color: string
 	editor: IEditor
 	isLast: boolean
+	userMap: IUser[]
 }
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
-const Column = ({ title, index, cards, color, editor, isLast }: IProps) => {
+const Column = ({ title, index, cards, color, editor, isLast, userMap }: IProps) => {
 	const { t } = useTranslation('common')
 	const [isAdding, setIsAdding] = useState(false)
 	const [newCard, setNewCard] = useState('')
@@ -74,7 +75,7 @@ const Column = ({ title, index, cards, color, editor, isLast }: IProps) => {
 				/>
 			</Flex>
 			<Box backgroundColor="gray.200" borderBottomRadius="8px" maxH="100%" p="8px">
-				<CardList listId={title} title={title} listType="CARD" editor={editor} cards={cards} />
+				<CardList listId={title} title={title} listType="CARD" editor={editor} cards={cards} userMap={userMap} />
 				{isAdding ? (
 					<form>
 						<Flex py="5px">

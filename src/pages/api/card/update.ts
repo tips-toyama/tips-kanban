@@ -1,5 +1,5 @@
 import { authOptions } from '@/pages/api/auth/[...nextauth]'
-import type { IAction, IBoard } from '@/types'
+import type { IAction, IBoard, ICardDetails } from '@/types'
 import { historyUpdate } from '@/utils/historyUpdate'
 import admin from 'firebase-admin'
 import { getFirestore } from 'firebase-admin/firestore'
@@ -15,7 +15,7 @@ type Data = {
 }
 type IBody = {
 	id: string
-	data: IBoard
+	data: ICardDetails
 	action: IAction
 	checkLatest: number
 	force: boolean
@@ -54,6 +54,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
 	}
 
 	await db.collection(`${process.env.FIRESTORE_PREFIX}-card`).doc(body.id).update(data)
+
+	// if (body.action === 'doCheckList') {
+	// 	await db.collection(`${process.env.FIRESTORE_PREFIX}-board`).doc(body.boardId).update({
+	// 		checkList: body.data.checkList.length || 0,
+	// 		checkListDone: body.data.checkList.filter((item) => item.isDone).length || 0
+	// 	})
+	// }
 
 	historyUpdate(body.action, body.id, session.user?.email || '')
 	res.status(200).json({ success: true, error: false })
