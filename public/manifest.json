@@ -20,7 +20,7 @@
     "dir": "auto",
     "lang": "ja",
     "name": "TIPS Kanban",
-    "short_name": "Kanban management tool",
+    "short_name": "TIPS Kanban",
     "start_url": "https://kanban.we.tips",
     "scope": "https://kanban.we.tips"
 }
