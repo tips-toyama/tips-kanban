@@ -1,12 +1,13 @@
 'use client'
 
-import type { ICardDetails, ICheckList, IState, IUser } from '@/types'
-import { Box, Button, Checkbox, Editable, EditableInput, EditablePreview, Flex, IconButton, Input, Text } from '@chakra-ui/react'
+import type { ICardDetails, ICheckList, IState } from '@/types'
+import { Box, Button, Checkbox, Flex, IconButton, Input, Text } from '@chakra-ui/react'
 import React, { useState } from 'react'
 import '@mdxeditor/editor/style.css'
 import { updateCard } from '@/utils/update'
 import { ChevronDownIcon, ChevronUpIcon, DeleteIcon } from '@chakra-ui/icons'
 import { useTranslation } from 'next-i18next'
+import EditableText from './EditableText'
 
 interface IProps {
 	id: string
@@ -84,10 +85,7 @@ export const ComposerCheckList = ({ id: cardId, data, setData, color, cardProgre
 					<Flex key={c.id} justify="space-between">
 						<Flex>
 							<Checkbox isDisabled={isUpdating} isChecked={c.isDone} colorScheme={color} size="lg" onChange={(e) => checkListDoneUpdate(c.id, e.target.checked)} />
-							<Editable defaultValue={c.text} ml={2}>
-								<EditablePreview />
-								<EditableInput readOnly={isUpdating} onBlur={(e) => checkListTextUpdate(c.id, e.target.value)} />
-							</Editable>
+							<EditableText defaultValue={c.text} ml={2} onBlur={(e) => checkListTextUpdate(c.id, e.target.value)} inputProps={{ isReadOnly: isUpdating }} />
 						</Flex>
 						<Flex>
 							<IconButton aria-label="Move to up" isDisabled={isUpdating || i === 0} icon={<ChevronUpIcon />} size="xs" variant="ghost" onClick={() => checkListMove(c.id, 'up')} />

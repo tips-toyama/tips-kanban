@@ -2,8 +2,7 @@
 
 import type { ICard, IEditor } from '@/types'
 import { AddIcon, ChevronLeftIcon, ChevronRightIcon } from '@chakra-ui/icons'
-import { Box, Button, Editable, EditableInput, EditablePreview, Flex, IconButton, Input, Text } from '@chakra-ui/react'
-import { data, i } from 'framer-motion/client'
+import { Box, Button, Flex, IconButton, Input } from '@chakra-ui/react'
 import { useRef, useState } from 'react'
 import CardList from './CardList'
 import { useTranslation } from 'next-i18next'
