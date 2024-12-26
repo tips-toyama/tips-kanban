@@ -4,6 +4,7 @@ import { useState } from 'react'
 import CardItem from './CardItem'
 import Droppable from './Droppable'
 import type { Session } from 'next-auth'
+import { useWindowSize, checkSpUi } from '@/utils/useWindowSize'
 
 interface CardProps {
 	listId: string
@@ -16,6 +17,8 @@ interface CardProps {
 }
 export default function CardList(props: CardProps) {
 	const { cards, title, editor, userMap, session, filter } = props
+	const [width] = useWindowSize()
+	const isSpUi = checkSpUi(width)
 	const myId = userMap.find((d) => session?.user?.name === d.name)?.id
 	const showCards = cards.filter((card) => {
 		if (filter.includes('mine') && card.assigned?.includes(myId || '')) return true
@@ -25,7 +28,7 @@ export default function CardList(props: CardProps) {
 	})
 
 	return (
-		<Box display="flex" flexDir="column" paddingBottom={0} transition="background-color 0.2s ease, opacity 0.1s ease" userSelect="none" w="250px" maxH="calc(100svh - 150px)">
+		<Box display="flex" flexDir="column" paddingBottom={0} transition="background-color 0.2s ease, opacity 0.1s ease" userSelect="none" w="250px" maxH={isSpUi ? 'calc(100svh - 180px)' : 'calc(100svh - 150px)'}>
 			<Box overflowX="hidden" overflowY="auto" maxH="100%">
 				<Box h="100%">
 					<Box h="100%">

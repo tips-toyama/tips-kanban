@@ -13,11 +13,14 @@ import NextLink from 'next/link'
 import { useRouter } from 'next/router'
 
 import { useEffect, useState } from 'react'
+import { useWindowSize, checkSpUi } from '@/utils/useWindowSize'
 const interval = 3000000
 //const interval = 3000
 export default function Home({ id }: { id: string }) {
 	const { t } = useTranslation('common')
 	const router = useRouter()
+	const [width] = useWindowSize()
+	const isSpUi = checkSpUi(width)
 	const { data: session, status } = useSession()
 	if (status === 'unauthenticated') {
 		localStorage.setItem('redirect', router.asPath)
@@ -96,13 +99,13 @@ export default function Home({ id }: { id: string }) {
 				<style>{'body { background-color: #eee; overflow: hidden;}'}</style>
 			</Head>
 			<Box>
-				<Flex h="40px" backgroundColor={`${meta?.color}.500`} w="100vw" color="white" align="center" px="10px" justify="space-between">
+				<Flex h={isSpUi ? '50px' : '40px'} backgroundColor={`${meta?.color}.500`} w="100vw" color="white" align="center" px="10px" justify="space-between">
 					<Flex align="center">
-						<IconButton icon={<ArrowBackIcon />} aria-label="go to home" ml={2} onClick={() => router.push('/')} variant="outline" size="xs" colorScheme="whiteAlpha" color="white" />
+						<IconButton icon={<ArrowBackIcon />} aria-label="go to home" ml={2} onClick={() => router.push('/')} variant="outline" size={isSpUi ? 'sm' : 'xs'} colorScheme="whiteAlpha" color="white" />
 						<Text fontSize={22} mx={3}>{meta?.title || ''}</Text>
 						<Popover onClose={() => updateMeta(id, setLatest, meta?.title || '', meta?.color || 'blue', meta?.visibility || 'private')}>
 							<PopoverTrigger>
-								<IconButton icon={<EditIcon />} aria-label="edit" variant="outline" size="xs" colorScheme="whiteAlpha" color="white" />
+								<IconButton icon={<EditIcon />} aria-label="edit" variant="outline" size={isSpUi ? 'sm' : 'xs'} colorScheme="whiteAlpha" color="white" />
 							</PopoverTrigger>
 							<PopoverContent color="black">
 								<PopoverArrow />
@@ -118,7 +121,7 @@ export default function Home({ id }: { id: string }) {
 											aria-label="blue"
 											onClick={() => setMeta({ title: meta?.title || '', color: 'blue', visibility: meta?.visibility || 'private' })}
 											colorScheme="blue"
-											size="xs"
+											size={isSpUi ? 'sm' : 'xs'}
 											mx={1}
 											icon={meta?.color === 'blue' ? <CheckIcon /> : undefined}
 										/>
@@ -126,7 +129,7 @@ export default function Home({ id }: { id: string }) {
 											aria-label="green"
 											onClick={() => setMeta({ title: meta?.title || '', color: 'green', visibility: meta?.visibility || 'private' })}
 											colorScheme="green"
-											size="xs"
+											size={isSpUi ? 'sm' : 'xs'}
 											mx={1}
 											icon={meta?.color === 'green' ? <CheckIcon /> : undefined}
 										/>
@@ -134,7 +137,7 @@ export default function Home({ id }: { id: string }) {
 											aria-label="red"
 											onClick={() => setMeta({ title: meta?.title || '', color: 'red', visibility: meta?.visibility || 'private' })}
 											colorScheme="red"
-											size="xs"
+											size={isSpUi ? 'sm' : 'xs'}
 											mx={1}
 											icon={meta?.color === 'red' ? <CheckIcon /> : undefined}
 										/>
@@ -142,7 +145,7 @@ export default function Home({ id }: { id: string }) {
 											aria-label="purple"
 											onClick={() => setMeta({ title: meta?.title || '', color: 'purple', visibility: meta?.visibility || 'private' })}
 											colorScheme="purple"
-											size="xs"
+											size={isSpUi ? 'sm' : 'xs'}
 											mx={1}
 											icon={meta?.color === 'purple' ? <CheckIcon /> : undefined}
 										/>
@@ -150,7 +153,7 @@ export default function Home({ id }: { id: string }) {
 											aria-label="orange"
 											onClick={() => setMeta({ title: meta?.title || '', color: 'orange', visibility: meta?.visibility || 'private' })}
 											colorScheme="orange"
-											size="xs"
+											size={isSpUi ? 'sm' : 'xs'}
 											mx={1}
 											icon={meta?.color === 'orange' ? <CheckIcon /> : undefined}
 										/>
@@ -158,7 +161,7 @@ export default function Home({ id }: { id: string }) {
 											aria-label="gray"
 											onClick={() => setMeta({ title: meta?.title || '', color: 'gray', visibility: meta?.visibility || 'private' })}
 											colorScheme="gray"
-											size="xs"
+											size={isSpUi ? 'sm' : 'xs'}
 											mx={1}
 											icon={meta?.color === 'gray' ? <CheckIcon /> : undefined}
 										/>
@@ -178,7 +181,7 @@ export default function Home({ id }: { id: string }) {
 					</Flex>
 					<Popover>
 						<PopoverTrigger>
-							<Avatar cursor="pointer" name={session?.user?.name || ''} size="xs" />
+							<Avatar cursor="pointer" name={session?.user?.name || ''} size={isSpUi ? 'sm' : 'xs'} />
 						</PopoverTrigger>
 						<PopoverContent color="black">
 							<PopoverArrow />

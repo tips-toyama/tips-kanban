@@ -14,3 +14,4 @@ export const useWindowSize = (): number[] => {
 	}, [])
 	return size
 }
+export const checkSpUi = (width: number): boolean => width < 768

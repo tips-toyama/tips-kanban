@@ -11,10 +11,13 @@ import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
+import { useWindowSize, checkSpUi } from '@/utils/useWindowSize'
 
 export default function Home({ id }: { id: string }) {
 	const { t } = useTranslation('common')
 	const router = useRouter()
+	const [width] = useWindowSize()
+	const isSpUi = checkSpUi(width)
 	const [isLoading, setIsLoading] = useState(false)
 	const [newBoard, setNewBoard] = useState('')
 	const [visibility, setVisibility] = useState('public')
@@ -58,21 +61,21 @@ export default function Home({ id }: { id: string }) {
 	return (
 		<>
 			<Head>
-				<title>Kanban</title>
-				<meta name="description" content="TIPS Kanvan" />
+				<title>{process.env.NEXT_PUBLIC_TITLE || 'TIPS Kanban'}</title>
+				<meta name="description" content={process.env.NEXT_PUBLIC_TITLE || 'TIPS Kanban'} />
 				<meta name="viewport" content="width=device-width, initial-scale=1" />
 				<link rel="icon" href="/favicon.ico" />
 				<style>{'body { background-color: #eee; overflow: auto;}'}</style>
 			</Head>
 			<Box>
-				<Flex h="40px" backgroundColor="blue.500" w="100vw" color="white" align="center" px="10px" justify="space-between">
+				<Flex h={isSpUi ? '50px' : '40px'} backgroundColor="blue.500" w="100vw" color="white" align="center" px="10px" justify="space-between">
 					<Flex>
-						<Text fontSize={22}>TIPS Kanban</Text>
+						<Text fontSize={22}>{process.env.NEXT_PUBLIC_TITLE || 'TIPS Kanban'}</Text>
 						{isLoading && <Spinner ml={2} size="md" />}
 					</Flex>
 					<Popover>
 						<PopoverTrigger>
-							<Avatar cursor="pointer" name={session?.user?.name || ''} size="xs" />
+							<Avatar cursor="pointer" name={session?.user?.name || ''} size={isSpUi ? 'sm' : 'xs'} />
 						</PopoverTrigger>
 						<PopoverContent color="black">
 							<PopoverArrow />

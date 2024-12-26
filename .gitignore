@@ -39,5 +39,6 @@ src/pages/api/development
 src/pages/api/auth/*
 /public/sw.js
 /public/workbox*
+/public/manifest.json
 
 update.sh

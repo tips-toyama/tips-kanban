@@ -17,6 +17,9 @@ const provider: any = {
 export const authOptions: AuthOptions = {
 	// Configure one or more authentication providers
 	providers: [provider],
+	pages: {
+		signIn: '/login',
+	},
 	callbacks: {
 		signIn: async ({ user }: any) => {
 			if (admin.apps.length === 0) {

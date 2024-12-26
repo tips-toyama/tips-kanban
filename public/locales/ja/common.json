@@ -29,6 +29,8 @@
     "noAssigned": "メンバー割り当てなし",
     "history": "操作履歴",
     "historyBase": "{{name}}さんが{{action}}。",
+    "login": "ログイン",
+    "signIn": "{{method}}でログイン",
     "action": {
         "changeContent": "テキストを変更しました",
         "cardTitleUpdate": "カード名を変更しました",

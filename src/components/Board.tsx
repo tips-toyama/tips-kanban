@@ -3,7 +3,7 @@
 import type { IBoard, ICard, ICardDetails, IFilter, IState, IUser } from '@/types'
 import { findColumn } from '@/utils/search'
 import { addCardUpdate, updateBoard as update } from '@/utils/update'
-import { useWindowSize } from '@/utils/useWindowSize'
+import { checkSpUi, useWindowSize } from '@/utils/useWindowSize'
 import { ArrowBackIcon, CheckIcon, CopyIcon, DeleteIcon } from '@chakra-ui/icons'
 import { IoPersonAddOutline, IoPersonRemoveOutline } from 'react-icons/io5'
 import {
@@ -56,6 +56,7 @@ interface IEditingCard extends ICard {
 export const Board = ({ id, columns, setColumns, initOrder, color, setLatest, userMap, session }: IProps) => {
 	const { t } = useTranslation('common')
 	const [width] = useWindowSize()
+	const isSpUi = checkSpUi(width)
 	const [ordered, setOrdered] = useState(initOrder)
 	const [editingCard, setEditingCard] = useState<IEditingCard | null>(null)
 	const [modalLoading, setModalLoading] = useState(false)
@@ -229,17 +230,17 @@ export const Board = ({ id, columns, setColumns, initOrder, color, setLatest, us
 								<EditableText textProps={{ fontSize: 32 }} defaultValue={editingCard.text} onBlur={(e) => cardTitleUpdate(editingCard.id, e.target.value, editingCard.text)} />
 								{!modalLoading && (
 									<Flex mr="24px" pos="relative" >
-										<IconButton title={t('duplicate')} size="xs" onClick={() => editor.copyItem(editingCard.id)} icon={<CopyIcon />} aria-label="Copy this card" />
-										<IconButton title={t('delete')} size="xs" ml={1} colorScheme="red" onClick={() => editor.deleteItem(editingCard.id)} icon={<DeleteIcon />} aria-label="Delete this card" />
+										<IconButton title={t('duplicate')} size={isSpUi ? 'sm' : 'xs'} onClick={() => editor.copyItem(editingCard.id)} icon={<CopyIcon />} aria-label="Copy this card" />
+										<IconButton title={t('delete')} size={isSpUi ? 'sm' : 'xs'} ml={isSpUi ? 3 : 1} colorScheme="red" onClick={() => editor.deleteItem(editingCard.id)} icon={<DeleteIcon />} aria-label="Delete this card" />
 									</Flex>
 								)}
 							</Flex>
 							<ModalCloseButton isDisabled={hasUnsavedChanges} mb={2} />
 							<Flex borderWidth={2} p={1} borderRadius={5} borderColor={userEditingMode ? 'red.200' : 'rgba(0,0,0,0)'}>
 								{(!editingCard.assigned || editingCard.assigned.length === 0) && <Text fontStyle="italic" fontSize="1rem">{t('noAssigned')}</Text>}
-								<AvatarGroup size="xs" max={15}>{editingCard.assigned?.map((user) => <UserIcon key={user} user={user} userMap={userMap} onClick={() => cardUserUpdate('delete', editingCard.id, user)} size="xs" deleteMode={userEditingMode} />)}</AvatarGroup>
+								<AvatarGroup size={isSpUi ? 'sm' : 'xs'} max={15}>{editingCard.assigned?.map((user) => <UserIcon key={user} user={user} userMap={userMap} onClick={() => cardUserUpdate('delete', editingCard.id, user)} size={isSpUi ? 'sm' : 'xs'} deleteMode={userEditingMode} />)}</AvatarGroup>
 								<Menu>
-									<MenuButton as={IconButton} ml={1} icon={<Icon as={IoPersonAddOutline} />} isDisabled={userEditingMode} size="xs" aria-label="add user" />
+									<MenuButton as={IconButton} ml={1} icon={<Icon as={IoPersonAddOutline} />} isDisabled={userEditingMode} size={isSpUi ? 'sm' : 'xs'} aria-label="add user" />
 									<MenuList zIndex={1000}>
 										{userMap.map((user) => <MenuItem key={user.name} onClick={() => cardUserUpdate('add', editingCard.id, user.id)}>
 											<Avatar name={user.name} size="xs" />
@@ -247,7 +248,7 @@ export const Board = ({ id, columns, setColumns, initOrder, color, setLatest, us
 										</MenuItem>)}
 									</MenuList>
 								</Menu>
-								<IconButton ml={1} icon={userEditingMode ? <CheckIcon /> : <Icon as={IoPersonRemoveOutline} />} colorScheme="red" isDisabled={!editingCard.assigned || editingCard.assigned.length === 0} variant="ghost" size="xs" onClick={() => setUserEditingMode(!userEditingMode)} aria-label="delete user" />
+								<IconButton ml={1} icon={userEditingMode ? <CheckIcon /> : <Icon as={IoPersonRemoveOutline} />} colorScheme="red" isDisabled={!editingCard.assigned || editingCard.assigned.length === 0} variant="ghost" size={isSpUi ? 'sm' : 'xs'} onClick={() => setUserEditingMode(!userEditingMode)} aria-label="delete user" />
 							</Flex>
 						</ModalHeader>
 						<ModalBody>

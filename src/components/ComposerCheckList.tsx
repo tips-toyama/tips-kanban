@@ -8,6 +8,7 @@ import { updateCard } from '@/utils/update'
 import { ChevronDownIcon, ChevronUpIcon, DeleteIcon } from '@chakra-ui/icons'
 import { useTranslation } from 'next-i18next'
 import EditableText from './EditableText'
+import { useWindowSize, checkSpUi } from '@/utils/useWindowSize'
 
 interface IProps {
 	id: string
@@ -23,6 +24,8 @@ interface IProps {
 export const ComposerCheckList = ({ id: cardId, data, setData, color, cardProgressUpdate, isUpdating, setIsUpdating, latest, setLatest }: IProps) => {
 	const [newCheckList, setNewCheckList] = useState('')
 	const { t } = useTranslation('common')
+	const [width] = useWindowSize()
+	const isSpUi = checkSpUi(width)
 	const checkListDoneUpdate = (id: string, done: boolean) => {
 		const newCL: ICheckList[] = data.checkList.map((c) => (c.id === id ? { ...c, isDone: done } : c))
 		const newData = { ...data }
@@ -88,16 +91,16 @@ export const ComposerCheckList = ({ id: cardId, data, setData, color, cardProgre
 							<EditableText defaultValue={c.text} ml={2} onBlur={(e) => checkListTextUpdate(c.id, e.target.value)} inputProps={{ isReadOnly: isUpdating }} />
 						</Flex>
 						<Flex>
-							<IconButton aria-label="Move to up" isDisabled={isUpdating || i === 0} icon={<ChevronUpIcon />} size="xs" variant="ghost" onClick={() => checkListMove(c.id, 'up')} />
+							<IconButton aria-label="Move to up" isDisabled={isUpdating || i === 0} icon={<ChevronUpIcon />} size={isSpUi ? 'sm' : 'xs'} variant="ghost" onClick={() => checkListMove(c.id, 'up')} />
 							<IconButton
 								aria-label="Move to down"
 								isDisabled={isUpdating || i === data.checkList.length - 1}
 								icon={<ChevronDownIcon />}
-								size="xs"
+								size={isSpUi ? 'sm' : 'xs'}
 								variant="ghost"
 								onClick={() => checkListMove(c.id, 'down')}
 							/>
-							<IconButton aria-label="Delete" isDisabled={isUpdating} icon={<DeleteIcon />} size="xs" variant="ghost" colorScheme="red" onClick={() => checkListRemove(c.id)} />
+							<IconButton aria-label="Delete" isDisabled={isUpdating} icon={<DeleteIcon />} size={isSpUi ? 'sm' : 'xs'} variant="ghost" colorScheme="red" onClick={() => checkListRemove(c.id)} />
 						</Flex>
 					</Flex>
 				))}

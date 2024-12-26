@@ -29,6 +29,8 @@
     "noAssigned": "No assigned member",
     "history": "History",
     "historyBase": "{{name}} {{action}}.",
+    "login": "Sign in",
+    "signIn": "Sign in with {{method}}",
     "action": {
         "changeContent": "changed the text of this card",
         "cardTitleUpdate": "changed the title of this card",
