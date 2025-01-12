@@ -9,6 +9,7 @@ import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import 'dayjs/locale/ja'
 import { useTranslation } from 'next-i18next'
+import { useRouter } from 'next/router'
 dayjs.extend(relativeTime)
 
 interface IProps {
@@ -20,7 +21,8 @@ const interval = 60000
 
 export const ComposerHistory = ({ id, userList }: IProps) => {
     const [histories, setHistories] = useState<IHistory[]>([])
-	const { t } = useTranslation('common')
+    const { locale } = useRouter()
+    const { t } = useTranslation('common')
     const fetchHistories = async () => {
         const res = await fetch(`/api/history?id=${id}`)
         const data = await res.json()
@@ -42,9 +44,9 @@ export const ComposerHistory = ({ id, userList }: IProps) => {
                 <Flex key={c.id}>
                     <Box w="100%">
                         <Flex w="100%">
-                            <Text>{t('historyBase', { name: findUser(userList, c.owner)?.name, action: t(`action.${c.action}`)})}</Text>
+                            <Text>{t('historyBase', { name: findUser(userList, c.owner)?.name, action: t(`action.${c.action}`) })}</Text>
                             <Text fontSize={14} color="gray.500">
-                                {dayjs(c.createdAtUnix * 1000).locale('ja').fromNow()}({dayjs(c.createdAtUnix * 1000).format('YYYY/MM/DD HH:mm')})
+                                {dayjs(c.createdAtUnix * 1000).locale(locale || 'en').fromNow()}({dayjs(c.createdAtUnix * 1000).format('YYYY/MM/DD HH:mm')})
                             </Text>
                         </Flex>
                     </Box>

@@ -27,6 +27,7 @@
     "others": "Assigned to others",
     "orphan": "Unassigned",
     "noAssigned": "No assigned member",
+    "deadline": "Deadline",
     "history": "History",
     "historyBase": "{{name}} {{action}}.",
     "login": "Sign in",
@@ -45,6 +46,7 @@
         "content": "changed the text of this card",
         "addAttachment": "added an attachment",
         "copy": "duplicated this card",
-        "cardUserUpdate": "changed the assignee"
+        "cardUserUpdate": "changed the assignee",
+        "cardDeadlineUpdate": "changed the deadline"
     }
 }

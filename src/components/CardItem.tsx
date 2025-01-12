@@ -2,10 +2,15 @@
 import type { ICard, IEditor, IUser } from '@/types'
 import { CopyIcon, DeleteIcon } from '@chakra-ui/icons'
 import { IoCheckboxOutline } from 'react-icons/io5'
-import { AvatarGroup, Box, Flex, IconButton, Text, Icon } from '@chakra-ui/react'
+import { AvatarGroup, Box, Flex, IconButton, Text, Icon, Badge } from '@chakra-ui/react'
 import { useTranslation } from 'next-i18next'
 import React, { useState } from 'react'
 import UserIcon from './UserIcon'
+import dayjs from 'dayjs'
+import relativeTime from 'dayjs/plugin/relativeTime'
+import 'dayjs/locale/ja'
+import { useRouter } from 'next/router'
+dayjs.extend(relativeTime)
 
 interface CardItemProps {
 	card: ICard
@@ -17,6 +22,7 @@ interface CardItemProps {
 }
 function CardItem(props: CardItemProps) {
 	const { card, isDragging, editor, index } = props
+	const { locale } = useRouter()
 	const { t } = useTranslation('common')
 	const [isContextMenuOpen, setIsContextMenuOpen] = useState(false)
 	const copyItem = () => {
@@ -27,6 +33,7 @@ function CardItem(props: CardItemProps) {
 		editor.deleteItem(card.id)
 		setIsContextMenuOpen(false)
 	}
+	const deadline = dayjs(card?.deadline ? card?.deadline * 1000 : undefined)
 
 	return (
 		<Box
@@ -66,6 +73,7 @@ function CardItem(props: CardItemProps) {
 					<Icon as={IoCheckboxOutline} />
 					<Text>{card.checkListDone}/{card.checkList}</Text>
 				</Flex>}
+				{card.deadline && <Badge mr={2} colorScheme={deadline.isAfter() ? 'green' : 'red'}>{deadline.locale(locale || 'en').fromNow()}</Badge>}
 				{(card.assigned && card.assigned.length > 0) && <AvatarGroup size="xs" max={5}>{card.assigned.map((user) => <UserIcon key={user} user={user} userMap={props.userMap} size="xs" />)}</AvatarGroup>}
 			</Flex>
 		</Box>

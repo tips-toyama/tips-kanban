@@ -27,6 +27,7 @@
     "others": "他の人に割り当て",
     "orphan": "未割り当て",
     "noAssigned": "メンバー割り当てなし",
+    "deadline": "締切",
     "history": "操作履歴",
     "historyBase": "{{name}}さんが{{action}}。",
     "login": "ログイン",
@@ -45,6 +46,7 @@
         "content": "テキストを変更しました",
         "addAttachment": "添付ファイルを追加しました",
         "copy": "複製しました",
-        "cardUserUpdate": "担当者を変更しました"
+        "cardUserUpdate": "担当者を変更しました",
+        "cardDeadlineUpdate": "締切を変更しました"
     }
 }

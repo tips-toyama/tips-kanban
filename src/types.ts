@@ -6,6 +6,7 @@ export interface ICard {
 	checkList?: number
 	checkListDone?: number
 	assigned?: string[]
+	deadline?: number
 }
 export interface IBoardMetaState {
 	title: string
@@ -54,6 +55,7 @@ export type IAction =
 	| 'addAttachment'
 	| 'copy'
 	| 'cardUserUpdate'
+	| 'cardDeadlineUpdate'
 export interface IHistory {
 	id: string
 	owner: string

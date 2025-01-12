@@ -4,11 +4,16 @@ import type { IBoard, ICard, ICardDetails, IFilter, IState, IUser } from '@/type
 import { findColumn } from '@/utils/search'
 import { addCardUpdate, updateBoard as update } from '@/utils/update'
 import { checkSpUi, useWindowSize } from '@/utils/useWindowSize'
-import { ArrowBackIcon, CheckIcon, CopyIcon, DeleteIcon } from '@chakra-ui/icons'
+import { CheckIcon, CopyIcon, DeleteIcon } from '@chakra-ui/icons'
 import { IoPersonAddOutline, IoPersonRemoveOutline } from 'react-icons/io5'
+import dayjs from 'dayjs'
+import relativeTime from 'dayjs/plugin/relativeTime'
+import 'dayjs/locale/ja'
+dayjs.extend(relativeTime)
 import {
 	Avatar,
 	AvatarGroup,
+	Badge,
 	Box,
 	Button,
 	Checkbox,
@@ -39,6 +44,7 @@ import EditableText from './EditableText'
 import { useTranslation } from 'next-i18next'
 import UserIcon from './UserIcon'
 import type { Session } from 'next-auth'
+import { useRouter } from 'next/router'
 
 interface IProps {
 	id: string
@@ -55,6 +61,7 @@ interface IEditingCard extends ICard {
 }
 export const Board = ({ id, columns, setColumns, initOrder, color, setLatest, userMap, session }: IProps) => {
 	const { t } = useTranslation('common')
+	const { locale } = useRouter()
 	const [width] = useWindowSize()
 	const isSpUi = checkSpUi(width)
 	const [ordered, setOrdered] = useState(initOrder)
@@ -189,6 +196,16 @@ export const Board = ({ id, columns, setColumns, initOrder, color, setLatest, us
 		setColumns(newColumns)
 		update(id, setLatest, cardId, 'cardTitleUpdate', newColumns)
 	}
+	const cardDeadlineUpdate = (cardId: string, newValue: Date) => {
+		if (newValue.getTime() === editingCard?.deadline || !editingCard) return
+		setEditingCard({ ...editingCard, deadline: dayjs(newValue).unix(), latest: editingCard?.latest || 0 })
+		const { key: targetKey, cardIndex } = findColumn(columns, cardId)
+		const newColumns = { ...columns }
+		if (!targetKey) return
+		newColumns[targetKey][cardIndex].deadline = dayjs(newValue).unix()
+		setColumns(newColumns)
+		update(id, setLatest, cardId, 'cardDeadlineUpdate', newColumns)
+	}
 	const cardUserUpdate = (mode: 'add' | 'delete', cardId: string, userId: string) => {
 		const { key: targetKey, cardIndex } = findColumn(columns, cardId)
 		const newColumns = { ...columns }
@@ -218,6 +235,7 @@ export const Board = ({ id, columns, setColumns, initOrder, color, setLatest, us
 		setNewColumn('')
 		update(id, setLatest, undefined, 'addColumn', newColumns, [...ordered, newColumn])
 	}
+	const deadline = dayjs(editingCard?.deadline ? editingCard?.deadline * 1000 : undefined)
 
 	return (
 		<>
@@ -236,7 +254,7 @@ export const Board = ({ id, columns, setColumns, initOrder, color, setLatest, us
 								)}
 							</Flex>
 							<ModalCloseButton isDisabled={hasUnsavedChanges} mb={2} />
-							<Flex borderWidth={2} p={1} borderRadius={5} borderColor={userEditingMode ? 'red.200' : 'rgba(0,0,0,0)'}>
+							<Flex borderWidth={2} px={1} borderRadius={5} borderColor={userEditingMode ? 'red.200' : 'rgba(0,0,0,0)'}>
 								{(!editingCard.assigned || editingCard.assigned.length === 0) && <Text fontStyle="italic" fontSize="1rem">{t('noAssigned')}</Text>}
 								<AvatarGroup size={isSpUi ? 'sm' : 'xs'} max={15}>{editingCard.assigned?.map((user) => <UserIcon key={user} user={user} userMap={userMap} onClick={() => cardUserUpdate('delete', editingCard.id, user)} size={isSpUi ? 'sm' : 'xs'} deleteMode={userEditingMode} />)}</AvatarGroup>
 								<Menu>
@@ -249,6 +267,11 @@ export const Board = ({ id, columns, setColumns, initOrder, color, setLatest, us
 									</MenuList>
 								</Menu>
 								<IconButton ml={1} icon={userEditingMode ? <CheckIcon /> : <Icon as={IoPersonRemoveOutline} />} colorScheme="red" isDisabled={!editingCard.assigned || editingCard.assigned.length === 0} variant="ghost" size={isSpUi ? 'sm' : 'xs'} onClick={() => setUserEditingMode(!userEditingMode)} aria-label="delete user" />
+							</Flex>
+							<Flex px={1} mt={2} align="center">
+								<Text mx={1} fontWeight="normal" fontSize="1rem">{t('deadline')}</Text>
+								<Input size={isSpUi ? 'sm' : 'xs'} defaultValue={deadline.format('YYYY-MM-DDTHH:mm')} onBlur={(e) => cardDeadlineUpdate(editingCard.id, dayjs(e.target.value).toDate())} type="datetime-local" w={140} />
+								{editingCard.deadline && <Badge ml={2} colorScheme={deadline.isAfter() ? 'green' : 'red'}>{deadline.locale(locale || 'en').fromNow()}</Badge>}
 							</Flex>
 						</ModalHeader>
 						<ModalBody>
