@@ -1,7 +1,7 @@
 'use client'
 
 import type { ICardDetails, IState, IUser } from '@/types'
-import { Box, Button, Flex, Input, Skeleton, Text } from '@chakra-ui/react'
+import { Box, Button, Flex, Input, Skeleton, Text, useColorMode } from '@chakra-ui/react'
 import Image from 'next/image'
 import React, { useEffect, useState } from 'react'
 import '@mdxeditor/editor/style.css'
@@ -41,6 +41,7 @@ const interval = 60000
 //const interval = 3000
 export const Composer = ({ data: initData, id, cardProgressUpdate, color, latest: initLatest, setHasUnsavedChanges, userMap }: IProps) => {
 	const { t } = useTranslation('common')
+	const { colorMode } = useColorMode()
 	const [latest, setLatest] = useState(initLatest)
 	const ref = React.useRef<MDXEditorMethods>(null)
 	const [data, setData] = useState<ICardDetails>(initData)
@@ -104,6 +105,7 @@ export const Composer = ({ data: initData, id, cardProgressUpdate, color, latest
 					ref={ref}
 					readOnly={isUpdating}
 					markdown={content}
+					contentEditableClassName="contentEditor"
 					plugins={[
 						headingsPlugin(),
 						listsPlugin(),
@@ -180,8 +182,10 @@ export const Composer = ({ data: initData, id, cardProgressUpdate, color, latest
             .markdownEditor h5 { font-weight: bold; font-size: 1.2rem;}
             .markdownEditor h6 { font-weight: bold; font-size: 1rem;}
             .markdownEditor ul, .markdownEditor ol { margin-left: 1rem; }
-            .markdownEditor a { color: #4063cf; cursor: pointer; }
-            `}</style>
+            `}
+			{colorMode === 'dark' && '.contentEditor {color: white} '}
+			{colorMode === 'dark' ? ' .contentEditor a { color: #9fb7ff; cursor: pointer; }' : '.contentEditor a { color: #4063cf; cursor: pointer; }'}
+			</style>
 		</Box>
 	)
 }

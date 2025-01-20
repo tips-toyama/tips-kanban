@@ -2,7 +2,7 @@
 
 import type { ICard, IEditor, IFilter, IUser } from '@/types'
 import { AddIcon, ChevronLeftIcon, ChevronRightIcon } from '@chakra-ui/icons'
-import { Box, Button, Flex, IconButton, Input } from '@chakra-ui/react'
+import { Box, Button, Flex, IconButton, Input, useColorMode } from '@chakra-ui/react'
 import { useRef, useState } from 'react'
 import CardList from './CardList'
 import { useTranslation } from 'next-i18next'
@@ -22,6 +22,7 @@ interface IProps {
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 const Column = ({ title, index, cards, color, editor, isLast, userMap, session, filter }: IProps) => {
 	const { t } = useTranslation('common')
+	const { colorMode } = useColorMode()
 	const [isAdding, setIsAdding] = useState(false)
 	const [newCard, setNewCard] = useState('')
 	const [inColumnTitleEdit, setInColumnTitleEdit] = useState(false)
@@ -77,7 +78,7 @@ const Column = ({ title, index, cards, color, editor, isLast, userMap, session, 
 					onClick={() => editor.moveColumn(title, 'right')}
 				/>
 			</Flex>
-			<Box backgroundColor="gray.200" borderBottomRadius="8px" maxH="100%" p="8px">
+			<Box backgroundColor={colorMode === 'dark' ? 'gray.800' : 'gray.200'} borderBottomRadius="8px" maxH="100%" p="8px">
 				<CardList listId={title} title={title} editor={editor} cards={cards} userMap={userMap} session={session} filter={filter} />
 				{isAdding ? (
 					<form>
@@ -86,7 +87,7 @@ const Column = ({ title, index, cards, color, editor, isLast, userMap, session, 
 								ref={ref}
 								placeholder={t('cardName')}
 								size="md"
-								backgroundColor="white"
+								backgroundColor={colorMode === 'dark' ? 'gray.700' : 'white'}
 								borderRadius="8px"
 								onBlur={() => setIsAdding(false)}
 								value={newCard}

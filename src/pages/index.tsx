@@ -1,7 +1,7 @@
 'use client'
 import type { IBoardMeta } from '@/types'
-import { CheckIcon, RepeatIcon } from '@chakra-ui/icons'
-import { Avatar, Box, Button, Flex, IconButton, Input, Popover, PopoverArrow, PopoverBody, PopoverCloseButton, PopoverContent, PopoverTrigger, Radio, RadioGroup, Spinner, Stack, Text, color } from '@chakra-ui/react'
+import { CheckIcon, MoonIcon, RepeatIcon, SunIcon } from '@chakra-ui/icons'
+import { Avatar, Box, Button, Flex, IconButton, Input, Popover, PopoverArrow, PopoverBody, PopoverCloseButton, PopoverContent, PopoverTrigger, Radio, RadioGroup, Spinner, Stack, Text, color, useColorMode } from '@chakra-ui/react'
 import type { GetServerSideProps } from 'next'
 import { getServerSession } from 'next-auth'
 import { signOut, useSession } from 'next-auth/react'
@@ -14,6 +14,7 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { useWindowSize, checkSpUi } from '@/utils/useWindowSize'
 
 export default function Home({ id }: { id: string }) {
+	const { colorMode, setColorMode } = useColorMode()
 	const { t } = useTranslation('common')
 	const router = useRouter()
 	const [width] = useWindowSize()
@@ -65,7 +66,7 @@ export default function Home({ id }: { id: string }) {
 				<meta name="description" content={process.env.NEXT_PUBLIC_TITLE || 'TIPS Kanban'} />
 				<meta name="viewport" content="width=device-width, initial-scale=1" />
 				<link rel="icon" href="/favicon.ico" />
-				<style>{'body { background-color: #eee; overflow: auto;}'}</style>
+				<style>{`body { background-color: ${colorMode === 'dark' ? '#111' : '#eee'}; overflow: auto;}`}</style>
 			</Head>
 			<Box>
 				<Flex h={isSpUi ? '50px' : '40px'} backgroundColor="blue.500" w="100vw" color="white" align="center" px="10px" justify="space-between">
@@ -77,21 +78,30 @@ export default function Home({ id }: { id: string }) {
 						<PopoverTrigger>
 							<Avatar cursor="pointer" name={session?.user?.name || ''} size={isSpUi ? 'sm' : 'xs'} />
 						</PopoverTrigger>
-						<PopoverContent color="black">
+						<PopoverContent color={colorMode === 'dark' ? 'white' : 'black'}>
 							<PopoverArrow />
 							<PopoverCloseButton />
 							<PopoverBody pt={8}>
 								<Box>{session?.user?.name}</Box>
-								<Button w="100%" onClick={() => signOut()}>
+								<Button w="100%" onClick={() => {
+									localStorage.removeItem('chakra-ui-color-mode')
+									signOut()
+								}}>
 									{t('logout')}
 								</Button>
-								<Flex mt={2}>
-									<NextLink href="/" locale="en">
-										<Button variant="link" isDisabled={router.locale === 'en'}>English</Button>
-									</NextLink>
-									<NextLink href="/" locale="ja">
-										<Button ml={2} variant="link" isDisabled={router.locale === 'ja'}>日本語</Button>
-									</NextLink>
+								<Flex justify="space-between" mt={2} align="center">
+									<Flex>
+										<NextLink href={`/board/${id}`} locale="en">
+											<Button variant="link" isDisabled={router.locale === 'en'}>English</Button>
+										</NextLink>
+										<NextLink href={`/board/${id}`} locale="ja">
+											<Button ml={2} variant="link" isDisabled={router.locale === 'ja'}>日本語</Button>
+										</NextLink>
+									</Flex>
+									<Flex>
+										<IconButton mr={2} colorScheme="yellow" onClick={() => setColorMode('light')} isDisabled={colorMode === 'light'} aria-label="Switch to Lightmode" icon={<SunIcon />} />
+										<IconButton onClick={() => setColorMode('dark')} colorScheme="teal" isDisabled={colorMode === 'dark'} aria-label="Switch to Darkmode" icon={<MoonIcon />} />
+									</Flex>
 								</Flex>
 							</PopoverBody>
 						</PopoverContent>
@@ -111,11 +121,11 @@ export default function Home({ id }: { id: string }) {
 					))}
 					<Popover>
 						<PopoverTrigger>
-							<Flex m={3} cursor="pointer" p={3} bgColor="white" w={150} h={150} backgroundColor="gray.50" borderRadius={5} my={2} align="center" justify="center">
+							<Flex m={3} cursor="pointer" p={3} bgColor="white" w={150} h={150} backgroundColor={colorMode === 'dark' ? 'gray.500' : 'gray.50'} borderRadius={5} my={2} align="center" justify="center">
 								<Text fontWeight="bold">{t('addBoard')}</Text>
 							</Flex>
 						</PopoverTrigger>
-						<PopoverContent color="black">
+						<PopoverContent color={colorMode === 'dark' ? 'white' : 'black'}>
 							<PopoverArrow />
 							<PopoverCloseButton />
 							<PopoverBody pt={8}>
@@ -141,6 +151,18 @@ export default function Home({ id }: { id: string }) {
 							</PopoverBody>
 						</PopoverContent>
 					</Popover>
+				</Flex>
+			</Box>
+			<Box p={2} w="100vw">
+				<Flex mt={2} align="center" justify="space-between">
+					<Flex>
+						<NextLink href={`/board/${id}`} locale="en">
+							<Button variant="link" isDisabled={router.locale === 'en'}>English</Button>
+						</NextLink>
+						<NextLink href={`/board/${id}`} locale="ja">
+							<Button ml={2} variant="link" isDisabled={router.locale === 'ja'}>日本語</Button>
+						</NextLink>
+					</Flex>
 				</Flex>
 			</Box>
 		</>

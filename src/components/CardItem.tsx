@@ -2,7 +2,7 @@
 import type { ICard, IEditor, IUser } from '@/types'
 import { CopyIcon, DeleteIcon } from '@chakra-ui/icons'
 import { IoCheckboxOutline } from 'react-icons/io5'
-import { AvatarGroup, Box, Flex, IconButton, Text, Icon, Badge } from '@chakra-ui/react'
+import { AvatarGroup, Box, Flex, IconButton, Text, Icon, Badge, useColorMode } from '@chakra-ui/react'
 import { useTranslation } from 'next-i18next'
 import React, { useState } from 'react'
 import UserIcon from './UserIcon'
@@ -22,6 +22,7 @@ interface CardItemProps {
 }
 function CardItem(props: CardItemProps) {
 	const { card, isDragging, editor, index } = props
+	const { colorMode } = useColorMode()
 	const { locale } = useRouter()
 	const { t } = useTranslation('common')
 	const [isContextMenuOpen, setIsContextMenuOpen] = useState(false)
@@ -49,7 +50,7 @@ function CardItem(props: CardItemProps) {
 			borderRadius="8px"
 			transition="border 0.1s ease"
 			_hover={{ borderColor: 'gray.500' }}
-			backgroundColor="white"
+			backgroundColor={colorMode === 'dark' ? 'gray.600' : 'white'}
 			data-is-dragging={isDragging}
 			data-testid={card.id}
 			data-index={index}

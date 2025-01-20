@@ -4,7 +4,7 @@ import type { IBoard, ICard, ICardDetails, IFilter, IState, IUser } from '@/type
 import { findColumn } from '@/utils/search'
 import { addCardUpdate, updateBoard as update } from '@/utils/update'
 import { checkSpUi, useWindowSize } from '@/utils/useWindowSize'
-import { CheckIcon, CopyIcon, DeleteIcon } from '@chakra-ui/icons'
+import { CheckIcon, CloseIcon, CopyIcon, DeleteIcon } from '@chakra-ui/icons'
 import { IoPersonAddOutline, IoPersonRemoveOutline } from 'react-icons/io5'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
@@ -34,6 +34,7 @@ import {
 	ModalOverlay,
 	Spinner,
 	Text,
+	useColorMode,
 	useDisclosure,
 } from '@chakra-ui/react'
 import type React from 'react'
@@ -62,6 +63,7 @@ interface IEditingCard extends ICard {
 export const Board = ({ id, columns, setColumns, initOrder, color, setLatest, userMap, session }: IProps) => {
 	const { t } = useTranslation('common')
 	const { locale } = useRouter()
+	const { colorMode } = useColorMode()
 	const [width] = useWindowSize()
 	const isSpUi = checkSpUi(width)
 	const [ordered, setOrdered] = useState(initOrder)
@@ -206,6 +208,18 @@ export const Board = ({ id, columns, setColumns, initOrder, color, setLatest, us
 		setColumns(newColumns)
 		update(id, setLatest, cardId, 'cardDeadlineUpdate', newColumns)
 	}
+	const cardDeadlineDelete = (cardId: string) => {
+		if (!editingCard) return
+		const newEC = { ...editingCard, latest: editingCard?.latest || 0 }
+		delete newEC.deadline
+		setEditingCard(newEC)
+		const { key: targetKey, cardIndex } = findColumn(columns, cardId)
+		const newColumns = { ...columns }
+		if (!targetKey) return
+		delete newColumns[targetKey][cardIndex].deadline
+		setColumns(newColumns)
+		update(id, setLatest, cardId, 'cardDeadlineUpdate', newColumns)
+	}
 	const cardUserUpdate = (mode: 'add' | 'delete', cardId: string, userId: string) => {
 		const { key: targetKey, cardIndex } = findColumn(columns, cardId)
 		const newColumns = { ...columns }
@@ -271,7 +285,7 @@ export const Board = ({ id, columns, setColumns, initOrder, color, setLatest, us
 							<Flex px={1} mt={2} align="center">
 								<Text mx={1} fontWeight="normal" fontSize="1rem">{t('deadline')}</Text>
 								<Input size={isSpUi ? 'sm' : 'xs'} defaultValue={deadline.format('YYYY-MM-DDTHH:mm')} onBlur={(e) => cardDeadlineUpdate(editingCard.id, dayjs(e.target.value).toDate())} type="datetime-local" w={140} />
-								{editingCard.deadline && <Badge ml={2} colorScheme={deadline.isAfter() ? 'green' : 'red'}>{deadline.locale(locale || 'en').fromNow()}</Badge>}
+								{editingCard.deadline && <Badge ml={2} colorScheme={deadline.isAfter() ? 'green' : 'red'} display="flex" alignItems="center" cursor="pointer" onClick={(e) => cardDeadlineDelete(editingCard.id)}>{deadline.locale(locale || 'en').fromNow()}<CloseIcon ml={2} fontSize={10} /></Badge>}
 							</Flex>
 						</ModalHeader>
 						<ModalBody>
@@ -295,7 +309,7 @@ export const Board = ({ id, columns, setColumns, initOrder, color, setLatest, us
 					{ordered.map((key, index) => (
 						<Column key={key} index={index} title={key} cards={columns[key]} isLast={index === ordered.length - 1} color={color} editor={editor} userMap={userMap} session={session} filter={filter} />
 					))}
-					<Box backgroundColor="white" border="1px solid" borderColor="gray.300" borderRadius={5} p={5} flexShrink={0} height={220}>
+					<Box backgroundColor={colorMode === 'dark' ? 'gray.700' : 'white'} border="1px solid" borderColor={colorMode === 'dark' ? 'gray.500' : 'gray.300'} borderRadius={5} p={5} flexShrink={0} height={220}>
 						<Text>{t('addColumn')}</Text>
 						<Flex>
 							<Input value={newColumn} onChange={(e) => setNewColumn(e.target.value)} />
