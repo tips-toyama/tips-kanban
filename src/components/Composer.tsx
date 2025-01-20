@@ -62,6 +62,7 @@ export const Composer = ({ data: initData, id, cardProgressUpdate, color, latest
 				setData(data.data)
 				setContent(data.data.content)
 				setHasNewCardData(false)
+				ref.current?.focus()
 			}
 		} catch {
 			console.error('Failed to fetch card')
@@ -127,7 +128,6 @@ export const Composer = ({ data: initData, id, cardProgressUpdate, color, latest
 					]}
 					onChange={(e) => {
 						setContent(e)
-						setHasUnsavedChanges(true)
 					}}
 					onBlur={async (e) => {
 						await updateCard(id, latest, setLatest, 'content', { ...data, content }, setIsUpdating, false)
@@ -183,8 +183,8 @@ export const Composer = ({ data: initData, id, cardProgressUpdate, color, latest
             .markdownEditor h6 { font-weight: bold; font-size: 1rem;}
             .markdownEditor ul, .markdownEditor ol { margin-left: 1rem; }
             `}
-			{colorMode === 'dark' && '.contentEditor {color: white} '}
-			{colorMode === 'dark' ? ' .contentEditor a { color: #9fb7ff; cursor: pointer; }' : '.contentEditor a { color: #4063cf; cursor: pointer; }'}
+				{colorMode === 'dark' && '.contentEditor {color: white} '}
+				{colorMode === 'dark' ? ' .contentEditor a { color: #9fb7ff; cursor: pointer; }' : '.contentEditor a { color: #4063cf; cursor: pointer; }'}
 			</style>
 		</Box>
 	)
