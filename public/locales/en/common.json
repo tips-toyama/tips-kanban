@@ -6,6 +6,7 @@
     "limited": "Limited(Unlisted)",
     "add": "Add",
     "confirmDelete": "Are you sure you want to delete? This action cannot be undone.",
+    "deleteColumnMoreThan1": "Cannot delete a column with more than one card.",
     "boardName": "Board Name",
     "boardDelete": "Delete Board",
     "shareLink": "Shareable link to this board",

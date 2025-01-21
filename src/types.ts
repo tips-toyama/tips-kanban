@@ -28,6 +28,7 @@ export type IEditor = {
 	copyItem: (target: string) => void
 	changeColumnTitle: (title: string, newTitle: string) => boolean
 	moveColumn: (title: string, direction: 'left' | 'right') => void
+	deleteColumn: (title: string) => void
 	dragStart: (e: React.DragEvent<HTMLDivElement>) => void
 	dragger: (e: React.DragEvent<HTMLDivElement>, cardId: string) => void
 	move: (target: string, index: number) => void

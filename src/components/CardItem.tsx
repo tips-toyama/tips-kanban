@@ -1,7 +1,7 @@
 'use client'
 import type { ICard, IEditor, IUser } from '@/types'
 import { CopyIcon, DeleteIcon } from '@chakra-ui/icons'
-import { IoCheckboxOutline } from 'react-icons/io5'
+import { RiCheckboxLine } from 'react-icons/ri'
 import { AvatarGroup, Box, Flex, IconButton, Text, Icon, Badge, useColorMode } from '@chakra-ui/react'
 import { useTranslation } from 'next-i18next'
 import React, { useState } from 'react'
@@ -71,7 +71,7 @@ function CardItem(props: CardItemProps) {
 			</Flex>
 			<Flex align="center">
 				{(card.checkList || 0) > 0 && <Flex>
-					<Icon as={IoCheckboxOutline} />
+					<Icon as={RiCheckboxLine} />
 					<Text>{card.checkListDone}/{card.checkList}</Text>
 				</Flex>}
 				{card.deadline && <Badge mr={2} colorScheme={deadline.isAfter() ? 'green' : 'red'}>{deadline.locale(locale || 'en').fromNow()}</Badge>}

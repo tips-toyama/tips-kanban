@@ -6,6 +6,7 @@
     "limited": "限定公開",
     "add": "追加",
     "confirmDelete": "本当に削除しますか？この操作は戻せません。",
+    "deleteColumnMoreThan1": "カードが1つ以上あるカラムは削除できません。",
     "boardName": "ボード名",
     "boardDelete": "ボードを削除",
     "shareLink": "このボードへの共有リンク",

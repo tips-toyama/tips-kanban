@@ -155,6 +155,16 @@ export const Board = ({ id, columns, setColumns, initOrder, color, setLatest, us
 			setOrdered(newOrdered)
 			update(id, setLatest, undefined, 'moveColumn', columns, newOrdered)
 		},
+		deleteColumn: (title: string) => {
+			if (columns[title].length > 0) return alert(t('deleteColumnMoreThan1'))
+			if (!confirm(t('confirmDelete'))) return
+			const newColumns = { ...columns }
+			delete newColumns[title]
+			const newOrder = ordered.filter((key) => key !== title)
+			setOrdered(newOrder)
+			setColumns(newColumns)
+			update(id, setLatest, undefined, 'moveColumn', newColumns, newOrder)
+		},
 		dragStart: (e: React.DragEvent<HTMLDivElement>) => {
 			e.stopPropagation()
 			e.dataTransfer.setData('text/plain', 'card')
@@ -304,39 +314,37 @@ export const Board = ({ id, columns, setColumns, initOrder, color, setLatest, us
 					</ModalContent>
 				)}
 			</Modal>
-			<Box>
-				<Box h="100svh" w="100%" mt={3} display="inline-flex" overflowX="scroll" ref={ref}>
-					{ordered.map((key, index) => (
-						<Column key={key} index={index} title={key} cards={columns[key]} isLast={index === ordered.length - 1} color={color} editor={editor} userMap={userMap} session={session} filter={filter} />
-					))}
-					<Box backgroundColor={colorMode === 'dark' ? 'gray.700' : 'white'} border="1px solid" borderColor={colorMode === 'dark' ? 'gray.500' : 'gray.300'} borderRadius={5} p={5} flexShrink={0} height={220}>
-						<Text>{t('addColumn')}</Text>
-						<Flex>
-							<Input value={newColumn} onChange={(e) => setNewColumn(e.target.value)} />
-							<Button ml={2} variant="outline" onClick={() => addColumn()}>
-								{t('add')}
-							</Button>
-						</Flex>
-						<Divider my={2} />
-						<Text>{t('filter')}</Text>
-						<Box>
-							<Checkbox isChecked={filter.includes('mine')} colorScheme={color} onChange={(e) => setFilter(filter.includes('mine') ? filter.filter((f) => f !== 'mine') : [...filter, 'mine'])}>
-								{t('mine')}
-							</Checkbox>
-						</Box>
-						<Box>
-							<Checkbox isChecked={filter.includes('others')} colorScheme={color} onChange={(e) => setFilter(filter.includes('others') ? filter.filter((f) => f !== 'others') : [...filter, 'others'])}>
-								{t('others')}
-							</Checkbox>
-						</Box>
-						<Box>
-							<Checkbox isChecked={filter.includes('orphan')} colorScheme={color} onChange={(e) => setFilter(filter.includes('orphan') ? filter.filter((f) => f !== 'orphan') : [...filter, 'orphan'])}>
-								{t('orphan')}
-							</Checkbox>
-						</Box>
+			<Box h="100%" pt={isSpUi ? '60px' : '50px'} w="100%" display="inline-flex" overflowX="scroll" ref={ref}>
+				{ordered.map((key, index) => (
+					<Column key={key} index={index} title={key} cards={columns[key]} isLast={index === ordered.length - 1} color={color} editor={editor} userMap={userMap} session={session} filter={filter} />
+				))}
+				<Box backgroundColor={colorMode === 'dark' ? 'gray.700' : 'white'} border="1px solid" borderColor={colorMode === 'dark' ? 'gray.500' : 'gray.300'} borderRadius={5} p={5} flexShrink={0} height={220}>
+					<Text>{t('addColumn')}</Text>
+					<Flex>
+						<Input value={newColumn} onChange={(e) => setNewColumn(e.target.value)} />
+						<Button ml={2} variant="outline" onClick={() => addColumn()}>
+							{t('add')}
+						</Button>
+					</Flex>
+					<Divider my={2} />
+					<Text>{t('filter')}</Text>
+					<Box>
+						<Checkbox isChecked={filter.includes('mine')} colorScheme={color} onChange={(e) => setFilter(filter.includes('mine') ? filter.filter((f) => f !== 'mine') : [...filter, 'mine'])}>
+							{t('mine')}
+						</Checkbox>
+					</Box>
+					<Box>
+						<Checkbox isChecked={filter.includes('others')} colorScheme={color} onChange={(e) => setFilter(filter.includes('others') ? filter.filter((f) => f !== 'others') : [...filter, 'others'])}>
+							{t('others')}
+						</Checkbox>
+					</Box>
+					<Box>
+						<Checkbox isChecked={filter.includes('orphan')} colorScheme={color} onChange={(e) => setFilter(filter.includes('orphan') ? filter.filter((f) => f !== 'orphan') : [...filter, 'orphan'])}>
+							{t('orphan')}
+						</Checkbox>
 					</Box>
 				</Box>
-			</Box >
+			</Box>
 		</>
 	)
 }

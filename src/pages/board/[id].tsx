@@ -97,9 +97,9 @@ export default function Home({ id }: { id: string }) {
 				<meta name="description" content="TIPS Kanvan" />
 				<meta name="viewport" content="width=device-width, initial-scale=1" />
 				<link rel="icon" href="/favicon.ico" />
-				<style>{`body { background-color: ${colorMode === 'dark' ? '#111' : '#eee'}; overflow: hidden;}`}</style>
+				<style>{`body { background-color: ${colorMode === 'dark' ? '#111' : '#eee'};}`}</style>
 			</Head>
-			<Box>
+			<Box h="100svh">
 				<Flex h={isSpUi ? '50px' : '40px'} zIndex={2} backgroundColor={`${meta?.color}.500`} w="100vw" color="white" align="center" px="10px" justify="space-between" position="fixed">
 					<Flex align="center">
 						<IconButton icon={<ArrowBackIcon />} aria-label="go to home" ml={2} onClick={() => router.push('/')} variant="outline" size={isSpUi ? 'sm' : 'xs'} colorScheme="whiteAlpha" color="white" />
@@ -222,9 +222,7 @@ export default function Home({ id }: { id: string }) {
 					</Flex>
 				)}
 				{!!columns ? (
-					<Box pt={isSpUi ? '50px' : '40px'} h="100svh" position="relative">
-						<Board id={id} columns={columns} initOrder={order} setColumns={setColumns} color={meta?.color || 'blue'} setLatest={setLatest} userMap={userMap} session={session} />
-					</Box>
+					<Board id={id} columns={columns} initOrder={order} setColumns={setColumns} color={meta?.color || 'blue'} setLatest={setLatest} userMap={userMap} session={session} />
 				) : (
 					<Flex pt={isSpUi ? '50px' : '40px'} w="100vw" h="100svh" justify="center" align="center">
 						<Spinner size="xl" />
