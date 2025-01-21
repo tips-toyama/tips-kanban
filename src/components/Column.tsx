@@ -47,7 +47,7 @@ const Column = ({ title, index, cards, color, editor, isLast, userMap, session, 
 	}
 
 	return (
-		<Box h="100%" mx="8px" display="flex" flexDir="column" borderTopRadius="4px" borderBottomRadius="8px">
+		<Box h="100svh" mx="8px" display="flex" flexDir="column" borderTopRadius="4px" borderBottomRadius="8px">
 			<Flex alignItems="center" h="40px" px="8px" justifyContent="space-between" backgroundColor={`${color}.600`} transition="background-color 0.2s ease" borderTopRadius="4px" flexShrink={0}>
 				<IconButton
 					aria-label="Move to left"
@@ -89,11 +89,14 @@ const Column = ({ title, index, cards, color, editor, isLast, userMap, session, 
 								size="md"
 								backgroundColor={colorMode === 'dark' ? 'gray.700' : 'white'}
 								borderRadius="8px"
-								onBlur={() => setIsAdding(false)}
+								onBlur={() => {
+									setNewCard('')
+									setIsAdding(false)
+								}}
 								value={newCard}
 								onChange={(e) => setNewCard(e.target.value)}
 							/>
-							<Button size="md" ml="3px" leftIcon={<AddIcon />} type="submit" onClick={() => add()}>
+							<Button size="md" ml="3px" leftIcon={<AddIcon />} type="submit" onClick={() => add()} onMouseDown={(e) => e.preventDefault()}>
 								{t('add')}
 							</Button>
 						</Flex>

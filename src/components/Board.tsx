@@ -305,7 +305,7 @@ export const Board = ({ id, columns, setColumns, initOrder, color, setLatest, us
 				)}
 			</Modal>
 			<Box>
-				<Box h="calc(100svh - 50px)" w="100%" mt={3} display="inline-flex" overflowX="scroll" ref={ref}>
+				<Box h="100svh" w="100%" mt={3} display="inline-flex" overflowX="scroll" ref={ref}>
 					{ordered.map((key, index) => (
 						<Column key={key} index={index} title={key} cards={columns[key]} isLast={index === ordered.length - 1} color={color} editor={editor} userMap={userMap} session={session} filter={filter} />
 					))}
