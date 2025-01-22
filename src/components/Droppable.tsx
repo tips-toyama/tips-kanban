@@ -5,8 +5,9 @@ interface IProps {
 	index: number
 	target: string
 	editor: IEditor
+	final?: boolean
 }
-const Droppable = ({ index, target, editor }: IProps) => {
+const Droppable = ({ index, target, editor, final }: IProps) => {
 	const [inDrag, setInDrag] = useState(false)
 	const onDragOver = (e: any) => {
 		e.preventDefault()
@@ -35,6 +36,22 @@ const Droppable = ({ index, target, editor }: IProps) => {
 				/>
 			</>
 		)
+	}
+
+	if (final) {
+		return (<Box
+			className='final-droppable'
+			transition="background-color 0.2s ease"
+			h={inDrag ? '32px' : '24px'}
+			top={inDrag ? '-16px' : '-16px'}
+			w="100%"
+			position="absolute"
+			backgroundColor={inDrag ? 'blue.300' : ''}
+			onDragOver={onDragOver}
+			onDragLeave={() => setInDrag(false)}
+			onDrop={onDrop}
+			zIndex={3}
+		/>)
 	}
 
 	return (

@@ -41,11 +41,11 @@ export default function CardList(props: CardProps) {
 								<Droppable target={title} index={index + 1} editor={editor} />
 							</Box>
 						))}
-						<Box position="relative">
-							<Droppable index={cards.length + 1} target={title} editor={editor} />
-						</Box>
 					</Box>
 				</Box>
+			</Box>
+			<Box position="relative">
+				<Droppable index={cards.length + 1} final={true} target={title} editor={editor} />
 			</Box>
 		</Box>
 	)
