@@ -37,7 +37,7 @@ export const userSubscribedList = async (userId: string) => {
 	const db = getFirestore()
 	const data = await db.collection(`${process.env.FIRESTORE_PREFIX}-user`).doc(userId).get()
 	const json = data.data() || { joined: [] }
-	return json.joined as string[]
+	return (json.joined || []) as string[]
 
 }
 

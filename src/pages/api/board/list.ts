@@ -32,7 +32,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
 	const joined = await userSubscribedList(session.user?.email || '')
 	snapshot.forEach((doc) => {
 		const data = doc.data() as IBoardMetaState
-		if (data.visibility === 'public' || joined.includes(doc.id)) boards.push({ ...data, id: doc.id } as IBoardMeta)
+		if (data.visibility === 'public' || (joined || []).includes(doc.id)) boards.push({ ...data, id: doc.id } as IBoardMeta)
 	})
 	res.status(200).json(boards)
 }

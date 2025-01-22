@@ -65,6 +65,8 @@ export default function Home({ id }: { id: string }) {
 				document.title = `${data.title} - Kanban`
 				return
 			}
+		} catch(e) {
+			router.push('/')
 		} finally {
 			setIsLoading(false)
 		}

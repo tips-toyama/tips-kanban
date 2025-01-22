@@ -260,6 +260,10 @@ export const Board = ({ id, columns, setColumns, initOrder, color, setLatest, us
 		update(id, setLatest, undefined, 'addColumn', newColumns, [...ordered, newColumn])
 	}
 	const deadline = dayjs(editingCard?.deadline ? editingCard?.deadline * 1000 : undefined)
+	const afterClose = (fn: () => void) => {
+		fn()
+		onClose()
+	}
 
 	return (
 		<>
@@ -272,8 +276,8 @@ export const Board = ({ id, columns, setColumns, initOrder, color, setLatest, us
 								<EditableText textProps={{ fontSize: 32 }} defaultValue={editingCard.text} onBlur={(e) => cardTitleUpdate(editingCard.id, e.target.value, editingCard.text)} />
 								{!modalLoading && (
 									<Flex mr="24px" pos="relative" >
-										<IconButton title={t('duplicate')} size={isSpUi ? 'sm' : 'xs'} onClick={() => editor.copyItem(editingCard.id)} icon={<CopyIcon />} aria-label="Copy this card" />
-										<IconButton title={t('delete')} size={isSpUi ? 'sm' : 'xs'} ml={isSpUi ? 3 : 1} colorScheme="red" onClick={() => editor.deleteItem(editingCard.id)} icon={<DeleteIcon />} aria-label="Delete this card" />
+										<IconButton title={t('duplicate')} size={isSpUi ? 'sm' : 'xs'} onClick={() => afterClose(() => editor.copyItem(editingCard.id))} icon={<CopyIcon />} aria-label="Copy this card" />
+										<IconButton title={t('delete')} size={isSpUi ? 'sm' : 'xs'} ml={isSpUi ? 3 : 1} colorScheme="red" onClick={() => afterClose(() => editor.deleteItem(editingCard.id))} icon={<DeleteIcon />} aria-label="Delete this card" />
 									</Flex>
 								)}
 							</Flex>
