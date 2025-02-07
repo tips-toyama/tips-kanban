@@ -1,7 +1,5 @@
 import { authOptions } from '@/pages/api/auth/[...nextauth]'
-import { IAction, IBoard } from '@/types'
-import { historyUpdate } from '@/utils/historyUpdate'
-import { publicOrUserIsSubscribed } from '@/utils/userUpdate'
+import { userJoin, userRemove, userSubscribedList } from '@/utils/userUpdate'
 import admin from 'firebase-admin'
 import { getFirestore } from 'firebase-admin/firestore'
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
@@ -44,10 +42,27 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
 		visibility: body.visibility
 	}
 
-    if (!publicOrUserIsSubscribed(session.user?.email || '', body.id)) {
-        res.status(401).json({ success: false, error: true, message: 'You are not in your board' })
+	const board = await db.collection(`${process.env.FIRESTORE_PREFIX}-board`).doc(body.id).get()
+	if (!board.exists) {
+		res.status(404).json({ success: false, error: true, message: 'Board not found' })
 		return
-    }
+	}
+	const boardData = board.data()
+	if (boardData?.visibility === 'public' && data.visibility === 'limited') {
+		// become limited, join this user to this board
+		await userJoin(session.user?.email || '', body.id)
+	}
+	if (boardData?.visibility === 'limited') {
+		const joined = await userSubscribedList(session.user?.email || '')
+		if (!(joined as string[]).includes(body.id)) {
+			res.status(401).json({ success: false, error: true, message: 'You are not in your board' })
+			return
+		}
+		if (data.visibility === 'public') {
+			// become public, remove this user from this board
+			await userRemove(session.user?.email || '', body.id)
+		}
+	}
 	await db.collection(`${process.env.FIRESTORE_PREFIX}-board`).doc(body.id).update(data)
 
 	res.status(200).json({ success: true, error: false })

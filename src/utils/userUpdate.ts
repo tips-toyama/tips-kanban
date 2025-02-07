@@ -1,7 +1,7 @@
 import { getFirestore } from 'firebase-admin/firestore'
 import admin from 'firebase-admin'
 
-export const userUpdate = async (userId: string, boardId: string) => {
+export const userJoin = async (userId: string, boardId: string) => {
 	if (admin.apps.length === 0) {
 		admin.initializeApp({
 			credential: admin.credential.cert({
@@ -22,6 +22,27 @@ export const userUpdate = async (userId: string, boardId: string) => {
 				...json.joined,
 				boardId,
 			],
+		})
+}
+export const userRemove = async (userId: string, boardId: string) => {
+	if (admin.apps.length === 0) {
+		admin.initializeApp({
+			credential: admin.credential.cert({
+				projectId: process.env.FIREBASE_PROJECT_ID,
+				clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+				privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+			}),
+		})
+	}
+	const db = getFirestore()
+	const data = await db.collection(`${process.env.FIRESTORE_PREFIX}-user`).doc(userId).get()
+	const json = data.data() || { joined: [] }
+	const newJoined = (json.joined || []).filter((x: string) => x !== boardId)
+	await db
+		.collection(`${process.env.FIRESTORE_PREFIX}-user`)
+		.doc(userId)
+		.update({
+			joined: newJoined,
 		})
 }
 export const userSubscribedList = async (userId: string) => {

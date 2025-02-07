@@ -1,6 +1,6 @@
 import { authOptions } from '@/pages/api/auth/[...nextauth]'
 import type { IBoard, IBoardMeta } from '@/types'
-import { userIsSubscribed, userUpdate } from '@/utils/userUpdate'
+import { userIsSubscribed, userJoin } from '@/utils/userUpdate'
 import admin from 'firebase-admin'
 import { getFirestore } from 'firebase-admin/firestore'
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
@@ -50,7 +50,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
 			return
 		}
 	} else if (vis === 'limited') {
-		if (!isSubscribed) userUpdate(session.user?.email || '', id)
+		if (!isSubscribed) userJoin(session.user?.email || '', id)
 	}
 	res.status(200).json(boardData)
 }

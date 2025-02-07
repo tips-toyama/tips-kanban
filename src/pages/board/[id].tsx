@@ -172,7 +172,7 @@ export default function Home({ id }: { id: string }) {
 									<RadioGroup my={2} onChange={(e: any) => setMeta({ ...(meta || { title: '', color: 'blue' }), visibility: e })} value={meta?.visibility || 'private'}>
 										<Stack direction="row">
 											<Radio value="public" colorScheme={meta?.color}>{t('public')}</Radio>
-											<Radio value="limited" colorScheme={meta?.color} isDisabled={initVis === 'public'}>{t('limited')}</Radio>
+											<Radio value="limited" colorScheme={meta?.color}>{t('limited')}</Radio>
 										</Stack>
 									</RadioGroup>
 									<Text>{t('shareLink')}</Text>
