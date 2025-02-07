@@ -28,6 +28,7 @@
     "others": "Assigned to others",
     "orphan": "Unassigned",
     "noAssigned": "No assigned member",
+    "selectUser": "Select a user",
     "deadline": "Deadline",
     "history": "History",
     "historyBase": "{{name}} {{action}}.",

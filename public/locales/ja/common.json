@@ -28,6 +28,7 @@
     "others": "他の人に割り当て",
     "orphan": "未割り当て",
     "noAssigned": "メンバー割り当てなし",
+    "selectUser": "ユーザーを選択",
     "deadline": "締切",
     "history": "操作履歴",
     "historyBase": "{{name}}さんが{{action}}。",

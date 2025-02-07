@@ -5,7 +5,7 @@ import { findColumn } from '@/utils/search'
 import { addCardUpdate, updateBoard as update } from '@/utils/update'
 import { checkSpUi, useWindowSize } from '@/utils/useWindowSize'
 import { CheckIcon, CloseIcon, CopyIcon, DeleteIcon } from '@chakra-ui/icons'
-import { IoPersonAddOutline, IoPersonRemoveOutline } from 'react-icons/io5'
+import { RiUserAddLine, RiUserMinusLine } from 'react-icons/ri'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import 'dayjs/locale/ja'
@@ -32,13 +32,20 @@ import {
 	ModalContent,
 	ModalHeader,
 	ModalOverlay,
+	Popover,
+	PopoverArrow,
+	PopoverBody,
+	PopoverCloseButton,
+	PopoverContent,
+	PopoverTrigger,
+	Select,
 	Spinner,
 	Text,
 	useColorMode,
 	useDisclosure,
 } from '@chakra-ui/react'
 import type React from 'react'
-import { useRef, useState } from 'react'
+import { type RefObject, useRef, useState } from 'react'
 import Column from './Column'
 import { Composer } from './Composer'
 import EditableText from './EditableText'
@@ -74,14 +81,17 @@ export const Board = ({ id, columns, setColumns, initOrder, color, setLatest, us
 	const [cardDetails, setCardDetails] = useState<ICardDetails | null>(null)
 	const [draggingCard, setDraggingCard] = useState('')
 	const [newColumn, setNewColumn] = useState('')
+	const [selectedUser, setSelectedUser] = useState('none:none')
 	const [filter, setFilter] = useState<IFilter[]>(['mine', 'others', 'orphan'])
 	const ref = useRef<HTMLDivElement>(null)
-	const { isOpen, onOpen, onClose } = useDisclosure()
+	const initialFocusRef = useRef<HTMLSelectElement>(null)
+	const { isOpen: isOpenModal, onOpen: onOpenModal, onClose: onCloseModal } = useDisclosure()
+	const { isOpen: isOpenPopover, onOpen: onOpenPopover, onClose: onClosePopover } = useDisclosure()
 
 	const editor = {
 		openModal: (card: ICard) => {
 			const fn = async () => {
-				onOpen()
+				onOpenModal()
 				setModalLoading(true)
 				setEditingCard(null)
 				setUserEditingMode(false)
@@ -92,7 +102,7 @@ export const Board = ({ id, columns, setColumns, initOrder, color, setLatest, us
 					setEditingCard({ ...card, latest: data.version })
 				} catch {
 					setEditingCard(null)
-					onClose()
+					onCloseModal()
 				} finally {
 					setModalLoading(false)
 				}
@@ -231,6 +241,7 @@ export const Board = ({ id, columns, setColumns, initOrder, color, setLatest, us
 		update(id, setLatest, cardId, 'cardDeadlineUpdate', newColumns)
 	}
 	const cardUserUpdate = (mode: 'add' | 'delete', cardId: string, userId: string) => {
+		if (userId === 'none:none' || !editingCard) return onClosePopover()
 		const { key: targetKey, cardIndex } = findColumn(columns, cardId)
 		const newColumns = { ...columns }
 		if (!targetKey) return
@@ -241,6 +252,8 @@ export const Board = ({ id, columns, setColumns, initOrder, color, setLatest, us
 		}
 		setColumns(newColumns)
 		update(id, setLatest, cardId, 'cardUserUpdate', newColumns)
+		setSelectedUser('none:none')
+		onClosePopover()
 		if (editingCard) setEditingCard({ ...newColumns[targetKey][cardIndex], latest: editingCard?.latest || 0 })
 	}
 	const cardProgressUpdate = (cardId: string, checkList: number, checkListDone: number) => {
@@ -262,12 +275,12 @@ export const Board = ({ id, columns, setColumns, initOrder, color, setLatest, us
 	const deadline = dayjs(editingCard?.deadline ? editingCard?.deadline * 1000 : undefined)
 	const afterClose = (fn: () => void) => {
 		fn()
-		onClose()
+		onCloseModal()
 	}
 
 	return (
 		<>
-			<Modal closeOnOverlayClick={!hasUnsavedChanges} isCentered={true} scrollBehavior="inside" blockScrollOnMount={false} isOpen={isOpen} onClose={onClose} size={modalLoading ? 'sm' : width < 600 ? 'full' : '3xl'}>
+			<Modal closeOnOverlayClick={!hasUnsavedChanges} isCentered={true} scrollBehavior="inside" blockScrollOnMount={false} isOpen={isOpenModal} onClose={onCloseModal} size={modalLoading ? 'sm' : width < 600 ? 'full' : '3xl'}>
 				<ModalOverlay />
 				{editingCard ? (
 					<ModalContent>
@@ -285,16 +298,24 @@ export const Board = ({ id, columns, setColumns, initOrder, color, setLatest, us
 							<Flex borderWidth={2} px={1} borderRadius={5} borderColor={userEditingMode ? 'red.200' : 'rgba(0,0,0,0)'}>
 								{(!editingCard.assigned || editingCard.assigned.length === 0) && <Text fontStyle="italic" fontSize="1rem">{t('noAssigned')}</Text>}
 								<AvatarGroup size={isSpUi ? 'sm' : 'xs'} max={15}>{editingCard.assigned?.map((user) => <UserIcon key={user} user={user} userMap={userMap} onClick={() => cardUserUpdate('delete', editingCard.id, user)} size={isSpUi ? 'sm' : 'xs'} deleteMode={userEditingMode} />)}</AvatarGroup>
-								<Menu>
-									<MenuButton as={IconButton} ml={1} icon={<Icon as={IoPersonAddOutline} />} isDisabled={userEditingMode} size={isSpUi ? 'sm' : 'xs'} aria-label="add user" />
-									<MenuList zIndex={1000}>
-										{userMap.map((user) => <MenuItem key={user.name} onClick={() => cardUserUpdate('add', editingCard.id, user.id)}>
-											<Avatar name={user.name} size="xs" />
-											<Text ml={2} fontSize="1rem">{user.name}</Text>
-										</MenuItem>)}
-									</MenuList>
-								</Menu>
-								<IconButton ml={1} icon={userEditingMode ? <CheckIcon /> : <Icon as={IoPersonRemoveOutline} />} colorScheme="red" isDisabled={!editingCard.assigned || editingCard.assigned.length === 0} variant="ghost" size={isSpUi ? 'sm' : 'xs'} onClick={() => setUserEditingMode(!userEditingMode)} aria-label="delete user" />
+								<Popover isOpen={isOpenPopover} onClose={onClosePopover} onOpen={onOpenPopover} initialFocusRef={initialFocusRef as unknown as RefObject<HTMLSelectElement>}>
+									<PopoverTrigger>
+										<IconButton ml={1} icon={<Icon as={RiUserAddLine} />} isDisabled={userEditingMode} size={isSpUi ? 'sm' : 'xs'} aria-label="add user" />
+									</PopoverTrigger>
+									<PopoverContent>
+										<PopoverArrow />
+										<PopoverBody>
+											<Flex>
+											<Select ref={initialFocusRef} value={selectedUser} onChange={(e) => setSelectedUser(e.target.value)} mr={2}>
+												<option value="none:none">{t('selectUser')}</option>
+												{userMap.map((user) => <option key={user.id} value={user.id}>{user.name}</option>)}
+											</Select>
+											<Button onClick={() => cardUserUpdate('add', editingCard.id, selectedUser)}>{t('add')}</Button>
+											</Flex>
+										</PopoverBody>
+									</PopoverContent>
+								</Popover>
+								<IconButton ml={1} icon={userEditingMode ? <CheckIcon /> : <Icon as={RiUserMinusLine} />} colorScheme="red" isDisabled={!editingCard.assigned || editingCard.assigned.length === 0} variant="ghost" size={isSpUi ? 'sm' : 'xs'} onClick={() => setUserEditingMode(!userEditingMode)} aria-label="delete user" />
 							</Flex>
 							<Flex px={1} mt={2} align="center">
 								<Text mx={1} fontWeight="normal" fontSize="1rem">{t('deadline')}</Text>
