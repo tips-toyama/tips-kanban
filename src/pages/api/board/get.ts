@@ -4,7 +4,7 @@ import { userIsSubscribed, userJoin } from '@/utils/userUpdate'
 import admin from 'firebase-admin'
 import { getFirestore } from 'firebase-admin/firestore'
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
-import type { NextApiRequest, NextApiResponse } from 'next'
+import type { NextApiRequest, NextApiResponse } from 'next/types'
 import { getServerSession } from 'next-auth'
 
 type Data = {

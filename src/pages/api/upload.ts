@@ -2,7 +2,7 @@ import { IAction, IBoard, ICardDetails } from '@/types'
 import admin from 'firebase-admin'
 import { getDownloadURL, getStorage } from 'firebase-admin/storage'
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
-import type { NextApiRequest, NextApiResponse } from 'next'
+import type { NextApiRequest, NextApiResponse } from 'next/types'
 
 type Data = {
 	url: string
