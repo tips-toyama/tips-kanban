@@ -182,6 +182,7 @@ export const Composer = ({ data: initData, id, cardProgressUpdate, color, latest
             .markdownEditor h5 { font-weight: bold; font-size: 1.2rem;}
             .markdownEditor h6 { font-weight: bold; font-size: 1rem;}
             .markdownEditor ul, .markdownEditor ol { margin-left: 1rem; }
+			.markdownEditor:focus-within { border-color: #3182ce; box-shadow: 0 0 0 2px #3182ce; border-radius: 0.375rem; }
             `}
 				{colorMode === 'dark' && '.contentEditor {color: white} '}
 				{colorMode === 'dark' ? ' .contentEditor a { color: #9fb7ff; cursor: pointer; }' : '.contentEditor a { color: #4063cf; cursor: pointer; }'}
