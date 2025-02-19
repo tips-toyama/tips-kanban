@@ -23,7 +23,7 @@ export default function Home({ id }: { id: string }) {
 	const [width] = useWindowSize()
 	const isSpUi = checkSpUi(width)
 	const { data: session, status } = useSession()
-	if (status === 'unauthenticated') {
+	if (status === 'unauthenticated' && router.asPath) {
 		localStorage.setItem('redirect', router.asPath)
 		return router.push('/api/auth/signin')
 	}

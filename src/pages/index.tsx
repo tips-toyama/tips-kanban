@@ -54,7 +54,7 @@ export default function Home({ id }: { id: string }) {
 	useEffect(() => {
 		init()
 		const redirect = localStorage.getItem('redirect')
-		if (redirect) {
+		if (redirect && redirect !== 'undefined') {
 			localStorage.removeItem('redirect')
 			router.push(redirect)
 		}
