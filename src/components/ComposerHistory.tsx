@@ -16,7 +16,6 @@ interface IProps {
     id: string
     userList: IUser[]
 }
-//const interval = 3000000
 const interval = 60000
 
 export const ComposerHistory = ({ id, userList }: IProps) => {

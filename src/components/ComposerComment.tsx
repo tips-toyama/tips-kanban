@@ -20,7 +20,6 @@ interface IProps {
 	setLatest: IState<number>
 	setIsUpdating: IState<boolean>
 }
-//const interval = 3000000
 const interval = 60000
 export const ComposerComment = ({ id, userList, isUpdating, setIsUpdating }: IProps) => {
 	const { t } = useTranslation('common')

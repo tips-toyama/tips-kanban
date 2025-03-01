@@ -38,7 +38,6 @@ interface IProps {
 	latest: number
 }
 const interval = 60000
-//const interval = 3000
 export const Composer = ({ data: initData, id, cardProgressUpdate, color, latest: initLatest, setHasUnsavedChanges, userMap }: IProps) => {
 	const { t } = useTranslation('common')
 	const { colorMode } = useColorMode()

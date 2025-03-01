@@ -14,8 +14,7 @@ import { useRouter } from 'next/router'
 
 import { useEffect, useState } from 'react'
 import { useWindowSize, checkSpUi } from '@/utils/useWindowSize'
-const interval = 3000000
-//const interval = 3000
+const interval = 30000
 export default function Home({ id }: { id: string }) {
 	const { colorMode, setColorMode } = useColorMode()
 	const { t } = useTranslation('common')
