@@ -54,7 +54,7 @@ export default function Home({ id }: { id: string }) {
 	useEffect(() => {
 		init()
 		const redirect = localStorage.getItem('redirect')
-		if (redirect && redirect !== 'undefined') {
+		if (redirect && redirect !== 'undefined' && redirect !== '/board/undefined') {
 			localStorage.removeItem('redirect')
 			router.push(redirect)
 		}
@@ -91,10 +91,10 @@ export default function Home({ id }: { id: string }) {
 								</Button>
 								<Flex justify="space-between" mt={2} align="center">
 									<Flex>
-										<NextLink href={`/board/${id}`} locale="en">
+										<NextLink href="/" locale="en">
 											<Button variant="link" isDisabled={router.locale === 'en'}>English</Button>
 										</NextLink>
-										<NextLink href={`/board/${id}`} locale="ja">
+										<NextLink href="/" locale="ja">
 											<Button ml={2} variant="link" isDisabled={router.locale === 'ja'}>日本語</Button>
 										</NextLink>
 									</Flex>

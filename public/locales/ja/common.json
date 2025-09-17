@@ -34,6 +34,7 @@
     "historyBase": "{{name}}さんが{{action}}。",
     "login": "ログイン",
     "signIn": "{{method}}でログイン",
+    "returnToTop": "トップページへ戻る",
     "action": {
         "changeContent": "テキストを変更しました",
         "cardTitleUpdate": "カード名を変更しました",
