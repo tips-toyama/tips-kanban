@@ -33,20 +33,10 @@ export default function Home({ id }: { id: string }) {
 				<Text>404 Not Found</Text>
 				<NextLink href="/">
 					<Button variant="link">
-						{t('returnToTop')}
+						Return to top page
 					</Button>
 				</NextLink>
 			</Box>
 		</>
 	)
-}
-
-export const getServerSideProps: GetServerSideProps = async (context) => {
-    return {
-        props: {
-            ...(await serverSideTranslations(context.locale || 'en', [
-                'common',
-            ])),
-        }
-    }
 }
