@@ -6,11 +6,11 @@ import type { JWT } from 'next-auth/jwt'
 import type { OAuthConfig } from 'next-auth/providers/oauth'
 
 // biome-ignore lint/style/noNonNullAssertion: <explanation>
-const clientId = process.env.TIPS_CLIENT_ID!
+const clientId = process.env.CLIENT_ID!
 // biome-ignore lint/style/noNonNullAssertion: <explanation>
-const clientSecret = process.env.TIPS_CLIENT_SECRET!
+const clientSecret = process.env.CLIENT_SECRET!
 // biome-ignore lint/style/noNonNullAssertion: <explanation>
-const apiOrigin = process.env.TIPS_API_ORIGIN!
+const apiOrigin = process.env.API_ORIGIN!
 
 type AccountAttributes = {
 	id: string
@@ -136,6 +136,7 @@ export const authOptions: AuthOptions = {
 	},
 	callbacks: {
 		async jwt({ token, account }) {
+			console.log('jwt')
 			if (account) {
 				return {
 					...token,
@@ -149,6 +150,7 @@ export const authOptions: AuthOptions = {
 			return refreshAccessToken(token)
 		},
 		signIn: async ({ user }) => {
+			console.log('signIn')
 			if (admin.apps.length === 0) {
 				admin.initializeApp({
 					credential: admin.credential.cert({
@@ -160,12 +162,14 @@ export const authOptions: AuthOptions = {
 			}
 			const db = getFirestore()
 			const isUser = await db.collection(`${process.env.FIRESTORE_PREFIX}-user`).doc(user.id).get()
+			console.log(isUser)
 			if (isUser.exists) return true
 			await db.collection(`${process.env.FIRESTORE_PREFIX}-user`).doc(user.id).set({
 				id: user.id,
 				name: user.name,
 				joined: [],
 			})
+			console.log('coming')
 			return true
 		},
 	},
