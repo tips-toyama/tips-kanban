@@ -49,8 +49,10 @@ export async function requestTokens(path: string, params: Record<string, string>
 		},
 		body: new URLSearchParams({ ...params, client_id: clientId }),
 	})
+	const json = await response.json()
+	console.log(json)
 	if (!response.ok) throw new Error(`OAuth token request failed (${response.status})`)
-	return parseTokens(await response.json(), startedAt)
+	return parseTokens(json, startedAt)
 }
 
 // Share concurrent refreshes of the same rotating token within this process.
