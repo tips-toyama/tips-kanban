@@ -1,10 +1,11 @@
+import { authOptions } from '@/pages/api/auth/[...nextauth]'
 import type { IBoard, IBoardMeta } from '@/types'
 import { userIsSubscribed, userJoin } from '@/utils/userUpdate'
 import admin from 'firebase-admin'
 import { getFirestore } from 'firebase-admin/firestore'
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next/types'
-import { getServerSession } from '@/lib/auth-session'
+import { getServerSession } from 'next-auth'
 
 type Data = {
 	error: true
@@ -15,7 +16,7 @@ type IReturn  = {
 } & IBoardMeta
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse<Data | IReturn>) {
-	const session = await getServerSession(req, res)
+	const session = await getServerSession(req, res, authOptions)
 	if (!session) {
 		res.status(401).json({ error: true, message: 'You must be logged in' })
 		return
@@ -42,14 +43,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
 	}
 	const boardData = board.data() as IReturn
 	const vis = boardData.visibility
-	const isSubscribed = await userIsSubscribed(session.user?.accountId || '', id)
+	const isSubscribed = await userIsSubscribed(session.user?.email || '', id)
 	if (vis === 'private') {
 		if (!isSubscribed) {
 			res.status(403).json({ error: true, message: 'You are not subscribed to this board' })
 			return
 		}
 	} else if (vis === 'limited') {
-		if (!isSubscribed) userJoin(session.user?.accountId || '', id)
+		if (!isSubscribed) userJoin(session.user?.email || '', id)
 	}
 	res.status(200).json(boardData)
 }

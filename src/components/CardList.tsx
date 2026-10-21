@@ -3,7 +3,7 @@ import { Box } from '@chakra-ui/react'
 import { useState } from 'react'
 import CardItem from './CardItem'
 import Droppable from './Droppable'
-import type { Session } from '@/lib/auth-client'
+import type { Session } from 'next-auth'
 import { useWindowSize, checkSpUi } from '@/utils/useWindowSize'
 
 interface CardProps {

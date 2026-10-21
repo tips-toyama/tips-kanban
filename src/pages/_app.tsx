@@ -1,14 +1,17 @@
 import { ChakraProvider } from '@chakra-ui/react'
-import { appWithTranslation } from 'next-i18next'
+import { SessionProvider } from 'next-auth/react'
 import type { AppProps } from 'next/app'
 import CSR from '../components/CSR'
+import { appWithTranslation } from 'next-i18next'
 
 function App({ Component, pageProps }: AppProps) {
 	return (
 		<CSR>
-			<ChakraProvider>
-				<Component {...pageProps} />
-			</ChakraProvider>
+			<SessionProvider>
+				<ChakraProvider>
+					<Component {...pageProps} />
+				</ChakraProvider>
+			</SessionProvider>
 		</CSR>
 	)
 }

@@ -1,10 +1,11 @@
+import { authOptions } from '@/pages/api/auth/[...nextauth]'
 import { IAction, IBoard, type ICardDetails } from '@/types'
 import { historyUpdate } from '@/utils/historyUpdate'
 import admin from 'firebase-admin'
 import { getFirestore } from 'firebase-admin/firestore'
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next/types'
-import { getServerSession } from '@/lib/auth-session'
+import { getServerSession } from 'next-auth'
 
 type Data = {
 	success: boolean
@@ -18,7 +19,7 @@ type IBody = {
 	copyFrom?: string
 }
 export default async function handler(req: NextApiRequest, res: NextApiResponse<Data>) {
-	const session = await getServerSession(req, res)
+	const session = await getServerSession(req, res, authOptions)
 	if (!session) {
 		res.status(401).json({ success: false, error: true, message: 'You must be logged in' })
 		return
@@ -63,6 +64,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
 
 	await db.collection(`${process.env.FIRESTORE_PREFIX}-history`).doc(body.id).set({ data: [] })
 	await db.collection(`${process.env.FIRESTORE_PREFIX}-comment`).doc(body.id).set({ data: [] })
-	historyUpdate('add', body.id, session.user?.accountId || '')
+	historyUpdate('add', body.id, session.user?.email || '')
 	res.status(200).json({ success: true, error: false })
 }

@@ -33,7 +33,6 @@
     "history": "操作履歴",
     "historyBase": "{{name}}さんが{{action}}。",
     "login": "ログイン",
-    "loginFailed": "ログインに失敗しました。もう一度お試しください。",
     "signIn": "{{method}}でログイン",
     "returnToTop": "トップページへ戻る",
     "action": {
