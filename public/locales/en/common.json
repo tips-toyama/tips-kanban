@@ -33,6 +33,7 @@
     "history": "History",
     "historyBase": "{{name}} {{action}}.",
     "login": "Sign in",
+    "loginFailed": "Sign-in failed. Please try again.",
     "signIn": "Sign in with {{method}}",
     "returnToTop": "Return to Top Page",
     "action": {

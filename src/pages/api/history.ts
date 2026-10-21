@@ -1,10 +1,9 @@
-import { authOptions } from '@/pages/api/auth/[...nextauth]'
 import { IBoard, ICardDetails, IComment, type IHistory } from '@/types'
 import admin from 'firebase-admin'
 import { getFirestore } from 'firebase-admin/firestore'
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next/types'
-import { getServerSession } from 'next-auth'
+import { getServerSession } from '@/lib/auth-session'
 
 type Data = {
 	error: true
@@ -12,7 +11,7 @@ type Data = {
 }
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse<Data | IHistory[]>) {
-	const session = await getServerSession(req, res, authOptions)
+	const session = await getServerSession(req, res)
 	if (!session) {
 		res.status(401).json({ error: true, message: 'You must be logged in' })
 		return

@@ -1,4 +1,3 @@
-import { authOptions } from '@/pages/api/auth/[...nextauth]'
 import { IAction, IBoard } from '@/types'
 import { historyUpdate } from '@/utils/historyUpdate'
 import { publicOrUserIsSubscribed, userIsSubscribed } from '@/utils/userUpdate'
@@ -6,7 +5,7 @@ import admin from 'firebase-admin'
 import { getFirestore } from 'firebase-admin/firestore'
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next/types'
-import { getServerSession } from 'next-auth'
+import { getServerSession } from '@/lib/auth-session'
 
 type Data = {
 	success: boolean
@@ -21,7 +20,7 @@ type IBody = {
 	version: number
 }
 export default async function handler(req: NextApiRequest, res: NextApiResponse<Data>) {
-	const session = await getServerSession(req, res, authOptions)
+	const session = await getServerSession(req, res)
 	if (!session) {
 		res.status(401).json({ success: false, error: true, message: 'You must be logged in' })
 		return
@@ -37,7 +36,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
 		})
 	}
 	const db = getFirestore()
-    if (!publicOrUserIsSubscribed(session.user?.email || '', body.id)) {
+    if (!publicOrUserIsSubscribed(session.user?.accountId || '', body.id)) {
         res.status(401).json({ success: false, error: true, message: 'You are not in your board' })
 		return
     }

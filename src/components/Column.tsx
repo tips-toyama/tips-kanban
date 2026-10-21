@@ -6,7 +6,7 @@ import { Box, Button, Flex, IconButton, Input, useColorMode } from '@chakra-ui/r
 import { useRef, useState } from 'react'
 import CardList from './CardList'
 import { useTranslation } from 'next-i18next'
-import type { Session } from 'next-auth'
+import type { Session } from '@/lib/auth-client'
 import { RiDeleteColumn } from 'react-icons/ri'
 
 

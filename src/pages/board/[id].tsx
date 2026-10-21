@@ -7,7 +7,7 @@ import { Avatar, Box, Button, Flex, IconButton, Input, Popover, PopoverArrow, Po
 import type { GetServerSideProps } from 'next'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
-import { signOut, useSession } from 'next-auth/react'
+import { signOut, useSession } from '@/lib/auth-client'
 import Head from 'next/head'
 import NextLink from 'next/link'
 import { useRouter } from 'next/router'
@@ -22,10 +22,6 @@ export default function Home({ id }: { id: string }) {
 	const [width] = useWindowSize()
 	const isSpUi = checkSpUi(width)
 	const { data: session, status } = useSession()
-	if (status === 'unauthenticated' && router.asPath) {
-		localStorage.setItem('redirect', router.asPath)
-		return router.push('/api/auth/signin')
-	}
 	const [initVis, setInitVis] = useState('private')
 	const [meta, setMeta] = useState<IBoardMetaState | null>(null)
 	const [columns, setColumns] = useState<IBoard | null>(null)
@@ -36,6 +32,13 @@ export default function Home({ id }: { id: string }) {
 	const [userMap, setUserMap] = useState<IUser[]>([])
 	const [latest, setLatest] = useState(0)
 
+
+	useEffect(() => {
+		if (status === 'unauthenticated' && router.isReady) {
+			localStorage.setItem('redirect', router.asPath)
+			void router.replace('/login')
+		}
+	}, [status, router.isReady, router.asPath, router])
 
 	const getUsers = async () => {
 		try {
