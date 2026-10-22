@@ -51,7 +51,7 @@ import { Composer } from './Composer'
 import EditableText from './EditableText'
 import { useTranslation } from 'next-i18next'
 import UserIcon from './UserIcon'
-import type { Session } from 'next-auth'
+import type { Session } from '@/auth/types'
 import { useRouter } from 'next/router'
 
 interface IProps {

@@ -51,5 +51,7 @@
         "copy": "複製しました",
         "cardUserUpdate": "担当者を変更しました",
         "cardDeadlineUpdate": "締切を変更しました"
-    }
+    },
+    "authFailed": "ログインに失敗しました。設定を確認するか、もう一度ログインしてください。",
+    "authRetryLater": "しばらく待ってから再試行してください。"
 }

@@ -51,5 +51,7 @@
         "copy": "duplicated this card",
         "cardUserUpdate": "changed the assignee",
         "cardDeadlineUpdate": "changed the deadline"
-    }
+    },
+    "authFailed": "Login failed. Check the configuration or start a new login.",
+    "authRetryLater": "Please wait before trying again."
 }

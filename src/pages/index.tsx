@@ -3,8 +3,8 @@ import type { IBoardMeta } from '@/types'
 import { CheckIcon, MoonIcon, RepeatIcon, SunIcon } from '@chakra-ui/icons'
 import { Avatar, Box, Button, Flex, IconButton, Input, Popover, PopoverArrow, PopoverBody, PopoverCloseButton, PopoverContent, PopoverTrigger, Radio, RadioGroup, Spinner, Stack, Text, color, useColorMode } from '@chakra-ui/react'
 import type { GetServerSideProps } from 'next'
-import { getServerSession } from 'next-auth'
-import { signOut, useSession } from 'next-auth/react'
+import { getServerSession } from '@/auth/server'
+import { signOut, useSession } from '@/auth/client'
 import Head from 'next/head'
 import NextLink from 'next/link'
 import { useRouter } from 'next/router'
@@ -24,7 +24,10 @@ export default function Home({ id }: { id: string }) {
 	const [visibility, setVisibility] = useState('public')
 	const [color, setColor] = useState('blue')
 	const [boards, setBoards] = useState<IBoardMeta[]>([])
-	const { data: session } = useSession()
+	const { data: session, status } = useSession()
+	useEffect(() => {
+		if (status === 'unauthenticated') window.location.assign('/login')
+	}, [status])
 	const init = async () => {
 		setIsLoading(true)
 		try {
@@ -169,7 +172,7 @@ export default function Home({ id }: { id: string }) {
 	)
 }
 export const getServerSideProps: GetServerSideProps = async (context) => {
-	const session = await getServerSession(context.req, context.res, {})
+	const session = await getServerSession(context.req, context.res)
 	if (!session) return { redirect: { destination: '/api/auth/signin', permanent: false } }
 	return {
 		props: {

@@ -7,7 +7,8 @@ import { Avatar, Box, Button, Flex, IconButton, Input, Popover, PopoverArrow, Po
 import type { GetServerSideProps } from 'next'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
-import { signOut, useSession } from 'next-auth/react'
+import { getServerSession } from '@/auth/server'
+import { signOut, useSession } from '@/auth/client'
 import Head from 'next/head'
 import NextLink from 'next/link'
 import { useRouter } from 'next/router'
@@ -22,10 +23,9 @@ export default function Home({ id }: { id: string }) {
 	const [width] = useWindowSize()
 	const isSpUi = checkSpUi(width)
 	const { data: session, status } = useSession()
-	if (status === 'unauthenticated' && router.asPath) {
-		localStorage.setItem('redirect', router.asPath)
-		return router.push('/api/auth/signin')
-	}
+	useEffect(() => {
+		if (status === 'unauthenticated') window.location.assign('/login')
+	}, [status])
 	const [initVis, setInitVis] = useState('private')
 	const [meta, setMeta] = useState<IBoardMetaState | null>(null)
 	const [columns, setColumns] = useState<IBoard | null>(null)
@@ -234,6 +234,8 @@ export default function Home({ id }: { id: string }) {
 	)
 }
 export const getServerSideProps: GetServerSideProps = async (context) => {
+	const session = await getServerSession(context.req, context.res)
+	if (!session) return { redirect: { destination: `/login?${new URLSearchParams({ callbackUrl: context.resolvedUrl })}`, permanent: false } }
 	const { id } = context.query
 
 	return {

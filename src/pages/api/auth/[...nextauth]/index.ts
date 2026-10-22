@@ -1,181 +1,126 @@
-import admin from 'firebase-admin'
-import { getFirestore } from 'firebase-admin/firestore'
 import type { NextApiRequest, NextApiResponse } from 'next'
-import NextAuth, { type AuthOptions } from 'next-auth'
-import type { JWT } from 'next-auth/jwt'
-import type { OAuthConfig } from 'next-auth/providers/oauth'
+import {
+	AuthError,
+	authFetch,
+	collection,
+	config,
+	createSession,
+	digest,
+	getServerSession,
+	randomToken,
+	readCookie,
+	requireSameOrigin,
+	safeReturnPath,
+	setCookie,
+	tokenHeaders,
+} from '../../../../auth/server'
 
-// biome-ignore lint/style/noNonNullAssertion: <explanation>
-const clientId = process.env.CLIENT_ID!
-// biome-ignore lint/style/noNonNullAssertion: <explanation>
-const clientSecret = process.env.CLIENT_SECRET!
-// biome-ignore lint/style/noNonNullAssertion: <explanation>
-const apiOrigin = process.env.API_ORIGIN!
-
-type AccountAttributes = {
-	id: string
-	name?: string
-	displayName?: string
-	display_name?: string
-}
-type AccountProfile = { attributes: AccountAttributes }
-type OAuthTokens = {
-	access_token: string
-	refresh_token: string
-	token_type: string
-	expires_in: number
-}
-
-function validateTokens(value: unknown): OAuthTokens {
-	const tokens = value as OAuthTokens | null
-	if (
-		!tokens ||
-		typeof tokens.access_token !== 'string' ||
-		!tokens.access_token ||
-		typeof tokens.refresh_token !== 'string' ||
-		!tokens.refresh_token ||
-		typeof tokens.token_type !== 'string' ||
-		tokens.token_type.toLowerCase() !== 'bearer' ||
-		typeof tokens.expires_in !== 'number' ||
-		!Number.isFinite(tokens.expires_in) ||
-		tokens.expires_in <= 0
-	) {
-		throw new Error('Invalid OAuth token response')
-	}
-	return tokens
-}
-
-const provider: OAuthConfig<AccountProfile> = {
-	id: 'tips',
-	name: 'TIPSアカウント',
-	type: 'oauth',
-	clientId,
-	clientSecret,
-	idToken: false,
-	// NextAuth generates S256 PKCE and state, validates them before exchange,
-	// and consumes their short-lived, HTTP-only cookies at the callback.
-	checks: ['pkce', 'state'],
-	client: { token_endpoint_auth_method: 'client_secret_basic' },
-	authorization: {
-		url: `${apiOrigin}/v3/login/authorize`,
-		params: { response_type: 'code' },
-	},
-	token: {
-		url: `${apiOrigin}/v3/login/token`,
-		async request({ client, provider, params, checks }) {
-			// Keep openid-client's state validation and PKCE exchange. It form-encodes
-			// both Basic credentials and the token body without sending client_secret there.
-			const tokens = await client.oauthCallback(provider.callbackUrl, params, checks)
-			validateTokens(tokens)
-			return { tokens }
-		},
-	},
-	userinfo: {
-		url: `${apiOrigin}/v1/account/get_credential`,
-		async request({ tokens }) {
-			const response = await fetch(`${apiOrigin}/v1/account/get_credential`, {
-				headers: { Authorization: `Bearer ${tokens.access_token}` },
-				cache: 'no-store',
-				redirect: 'error',
-			})
-			if (!response.ok) throw new Error(`Account profile request failed (${response.status})`)
-			return response.json()
-		},
-	},
-	profile(profile) {
-		const attributes = profile.attributes
-		if (typeof attributes?.id !== 'string' || !attributes.id) throw new Error('Missing account ID')
-		return {
-			id: attributes.id,
-			// Existing board membership uses session.user.email as the account ID.
-			email: attributes.id,
-			name: attributes.name || attributes.displayName || attributes.display_name,
-		}
-	},
-}
-
-const refreshRequests = new Map<string, Promise<OAuthTokens & { expiresAt: number }>>()
-
-async function refreshAccessToken(token: JWT): Promise<JWT> {
-	if (typeof token.refreshToken !== 'string' || !token.refreshToken) throw new Error('Login required')
-	const refreshToken = token.refreshToken
-	let request = refreshRequests.get(refreshToken)
-	if (!request) {
-		request = (async () => {
-			const encode = (value: string) => new URLSearchParams({ value }).toString().slice('value='.length)
-			const startedAt = Date.now()
-			const response = await fetch(`${apiOrigin}/v3/refresh`, {
-				method: 'POST',
-				cache: 'no-store',
-				redirect: 'error',
-				headers: {
-					'Content-Type': 'application/x-www-form-urlencoded',
-					Authorization: `Basic ${Buffer.from(`${encode(clientId)}:${encode(clientSecret)}`).toString('base64')}`,
-				},
-				body: new URLSearchParams({ grant_type: 'refresh_token', client_id: clientId, refresh_token: refreshToken }),
-			})
-			if (!response.ok) throw new Error(`OAuth refresh failed (${response.status}); login required`)
-			const tokens = validateTokens(await response.json())
-			return { ...tokens, expiresAt: startedAt + tokens.expires_in * 1000 }
-		})()
-		refreshRequests.set(refreshToken, request)
-	}
-	try {
-		const tokens = await request
-		return { ...token, accessToken: tokens.access_token, refreshToken: tokens.refresh_token, accessTokenExpires: tokens.expiresAt }
-	} finally {
-		if (refreshRequests.get(refreshToken) === request) refreshRequests.delete(refreshToken)
-	}
-}
-
-export const authOptions: AuthOptions = {
-	// OAuth tokens stay in the encrypted NextAuth JWT, never in the browser session response.
-	providers: [provider],
-	pages: {
-		signIn: '/login',
-	},
-	callbacks: {
-		async jwt({ token, account }) {
-			console.log('jwt')
-			if (account) {
-				return {
-					...token,
-					accessToken: account.access_token,
-					refreshToken: account.refresh_token,
-					accessTokenExpires: (account.expires_at || 0) * 1000,
-				}
-			}
-			if (typeof token.accessTokenExpires === 'number' && Date.now() < token.accessTokenExpires - 30_000) return token
-			// A failed refresh throws so NextAuth clears the session and requires login again.
-			return refreshAccessToken(token)
-		},
-		signIn: async ({ user }) => {
-			console.log('signIn')
-			if (admin.apps.length === 0) {
-				admin.initializeApp({
-					credential: admin.credential.cert({
-						projectId: process.env.FIREBASE_PROJECT_ID,
-						clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-						privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-					}),
-				})
-			}
-			const db = getFirestore()
-			const isUser = await db.collection(`${process.env.FIRESTORE_PREFIX}-user`).doc(user.id).get()
-			console.log(isUser)
-			if (isUser.exists) return true
-			await db.collection(`${process.env.FIRESTORE_PREFIX}-user`).doc(user.id).set({
-				id: user.id,
-				name: user.name,
-				joined: [],
-			})
-			console.log('coming')
-			return true
-		},
-	},
-}
+const one = (value: unknown) => (typeof value === 'string' && value ? value : undefined)
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
 	res.setHeader('Cache-Control', 'no-store')
 	res.setHeader('Pragma', 'no-cache')
-	return NextAuth(req, res, authOptions)
+	res.setHeader('Referrer-Policy', 'no-referrer')
+	const route = Array.isArray(req.query.nextauth) ? req.query.nextauth.join('/') : ''
+	const method = route === 'signout' ? 'POST' : 'GET'
+	if (req.method !== method) {
+		res.setHeader('Allow', method)
+		return res.status(405).json({ error: 'method_not_allowed' })
+	}
+	try {
+		if (route === 'session') return res.json(await getServerSession(req, res))
+		if (route === 'signout') {
+			requireSameOrigin(req)
+			const id = readCookie(req, 'session')
+			if (id) await collection('auth-session').doc(digest(id)).delete()
+			setCookie(res, 'session', '', 0)
+			return res.json({ url: '/login' })
+		}
+		if (route === 'signin' || route === 'error') return res.redirect(303, '/login')
+		if (route === 'signin/tips') {
+			const settings = config()
+			const state = randomToken()
+			const verifier = randomToken()
+			const pending = randomToken()
+			const previous = readCookie(req, 'pending')
+			if (previous) await collection('auth-pending').doc(digest(previous)).delete()
+			await collection('auth-pending')
+				.doc(digest(pending))
+				.create({ state, verifier, returnTo: safeReturnPath(req.query.callbackUrl), createdAt: Date.now(), cleanupAt: new Date(Date.now() + 600000) })
+			setCookie(res, 'pending', pending, 600)
+			const url = new URL('/v3/login/authorize', settings.api)
+			url.search = new URLSearchParams({
+				response_type: 'code',
+				client_id: settings.clientId,
+				redirect_uri: settings.callback,
+				code_challenge: digest(verifier),
+				code_challenge_method: 'S256',
+				state,
+			}).toString()
+			return res.redirect(303, url.href)
+		}
+		if (route === 'callback/tips') {
+			const pendingId = readCookie(req, 'pending')
+			setCookie(res, 'pending', '', 0)
+			const state = one(req.query.state)
+			const code = one(req.query.code)
+			if (!pendingId || !state) throw new AuthError('invalid_state')
+			const ref = collection('auth-pending').doc(digest(pendingId))
+			// Atomic consumption across instances prevents duplicate code exchanges.
+			const pending = await ref.firestore.runTransaction(async (transaction) => {
+				const data = (await transaction.get(ref)).data()
+				if (!data || data.state !== state || !Number.isFinite(data.createdAt) || data.createdAt > Date.now() || Date.now() - data.createdAt > 600000) throw new AuthError('invalid_state')
+				transaction.delete(ref)
+				return data
+			})
+			if (req.query.error) throw new AuthError('authorization_denied')
+			if (!code || !/^[A-Za-z0-9_-]{43}$/.test(code) || Object.keys(req.query).some((key) => !['nextauth', 'code', 'state'].includes(key))) throw new AuthError('invalid_callback')
+			const settings = config()
+			const tokens = await authFetch('/v3/login/token', {
+				method: 'POST',
+				headers: tokenHeaders(),
+				body: new URLSearchParams({ grant_type: 'authorization_code', client_id: settings.clientId, redirect_uri: settings.callback, code, code_verifier: pending.verifier }),
+			})
+			if (
+				typeof tokens.access_token !== 'string' ||
+				!tokens.access_token ||
+				tokens.token_type !== 'Bearer' ||
+				typeof tokens.refresh_token !== 'string' ||
+				!tokens.refresh_token ||
+				!Number.isFinite(tokens.expires_in) ||
+				tokens.expires_in <= 0
+			)
+				throw new AuthError('invalid_token_response')
+			const profile = await authFetch('/v1/account/get_credential', { headers: { Authorization: `Bearer ${tokens.access_token}` } })
+			const attributes = profile.attributes
+			if (typeof attributes?.id !== 'string' || !attributes.id || attributes.id.includes('/')) throw new AuthError('invalid_profile')
+			const name = [attributes.name, attributes.displayName, attributes.display_name].find((v) => typeof v === 'string' && v) || attributes.id
+			const user = { email: attributes.id, name }
+			const userRef = collection('user').doc(attributes.id)
+			await userRef.firestore.runTransaction(async (transaction) => {
+				if (!(await transaction.get(userRef)).exists) transaction.create(userRef, { id: attributes.id, name, joined: [] })
+			})
+			// Only the local app session persists. Upstream access/refresh tokens are discarded.
+			await createSession(req, res, user)
+			return res.redirect(303, safeReturnPath(pending.returnTo))
+		}
+		return res.status(404).json({ error: 'unknown_auth_route' })
+	} catch (error) {
+		const failure = error instanceof AuthError ? error : new AuthError('authentication_failed')
+		// Never log exception messages, callback URLs, codes, tokens, or upstream bodies.
+		console.error('Authentication failed', {
+			stage: ['signin/tips', 'callback/tips', 'session', 'signout'].includes(route) ? route : 'unknown',
+			code: failure.code,
+			status: failure.status,
+			errorId: failure.errorId,
+		})
+		if (route === 'session' || route === 'signout') return res.status(failure.status === 403 ? 403 : 503).json({ error: failure.code })
+		const params = new URLSearchParams({ error: failure.code })
+		if (failure.status) params.set('status', String(failure.status))
+		if (failure.errorId) params.set('error_id', failure.errorId)
+		if (failure.retryAfter) {
+			const delay = /^\d+$/.test(failure.retryAfter) ? Number(failure.retryAfter) * 1000 : Date.parse(failure.retryAfter) - Date.now()
+			if (Number.isFinite(delay) && delay > 0) params.set('retry_at', String(Date.now() + Math.min(delay, 86400000)))
+		}
+		return res.redirect(303, `/login?${params}`)
+	}
 }
